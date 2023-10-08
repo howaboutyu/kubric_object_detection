@@ -4,10 +4,35 @@ from kubric import file_io
 from pathlib import Path
 import tensorflow as tf
 import numpy as np
+import zipfile
+import os
 
 HDRI_ASSET = "gs://kubric-public/assets/HDRI_haven/HDRI_haven.json"
 HDRI_DIR = "gs://mv_bckgr_removal/hdri_haven/4k/"
 
+# Location of task zip
+BUCKET_NAME = 'tx-hyu-task'
+ZIP_FILE_PATH = 'drink_detection_assigment.zip'
+
+def download_and_unzip_gcs_zip(local_directory):
+    # Check if the local directory exists, and create it if it doesn't
+    if not os.path.exists(local_directory):
+        os.makedirs(local_directory)
+    
+    # Check if the ZIP file already exists locally
+    local_zip_path = os.path.join(local_directory, ZIP_FILE_PATH.lower())
+    if os.path.exists(local_zip_path):
+        # If the ZIP file exists locally, return
+        return
+
+    # Download the ZIP file from GCS if it doesn't exist locally
+    with tf.io.gfile.GFile(f'gs://{BUCKET_NAME}/{ZIP_FILE_PATH}', 'rb') as remote_file:
+        with open(local_zip_path, 'wb') as local_file:
+            local_file.write(remote_file.read())
+
+    # Unzip the downloaded ZIP file
+    with zipfile.ZipFile(local_zip_path, 'r') as zip_ref:
+        zip_ref.extractall(local_directory)
 
 def get_random_hdri():
     """Get a random HDRI from the Kubric public assets."""
@@ -82,3 +107,5 @@ def sample_point_in_half_sphere_shell(
 
         if inner_radius <= len_v <= outer_radius and correct_angle:
             return tuple(v)
+
+
