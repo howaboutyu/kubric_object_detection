@@ -15,11 +15,9 @@ Nvidia Omniverse requires a RTX card and I don't have one locally. Kubric is a p
 ## Kubric output
 
 Classes: 
-* background [0]
-* bottle [1-100]
-* can [101-200]
-* other [201-300]
 
+bottles - 1
+cans - 2
 
 ## Tasks
 ### Kubric 
@@ -28,8 +26,9 @@ Classes:
 * [ ] add random lighting, camera fov
 * [ ] add random motion blur
 * [ ] add random lightin
+* [ ] add random distractors
 * [ ] random background using hdri domes
-* [ ] add random textures/objects 
+* [ ] add textures/objects of cans and bottles
 
 ## Kubric to tfrecords
 
