@@ -12,25 +12,21 @@ from utils import get_random_hdri, add_hdri_dome, sample_point_in_half_sphere_sh
 logging.basicConfig(level="INFO")
 
 
-
-
-
 def generate_synthetic(
-        resolution=(300, 300),
-        frame_start=1,
-        frame_end=3,
-        output_dir="output",
-        num_cans=1,
-        num_bottles=1,
-        xy_scale=5,
-        tx_asset_directory = "/kubric/drink_detection_assigment"
-
+    resolution=(300, 300),
+    frame_start=1,
+    frame_end=3,
+    output_dir="output",
+    num_cans=1,
+    num_bottles=1,
+    xy_scale=5,
+    tx_asset_directory="/kubric/drink_detection_assigment",
 ):
-
-
     logging.info(f"Generating synthetic data in {output_dir}")
 
-    scene = kb.Scene(resolution=resolution, frame_start=frame_start, frame_end=frame_end)
+    scene = kb.Scene(
+        resolution=resolution, frame_start=frame_start, frame_end=frame_end
+    )
     renderer = KubricRenderer(scene)
 
     # scene += kb.Sphere(name="floor", scale=1000, position=(0, 0, +1000), background=True)
@@ -41,7 +37,6 @@ def generate_synthetic(
 
     bottle_obj_files = [obj_file for obj_file in obj_files if "bottle" in obj_file]
     can_obj_files = [obj_file for obj_file in obj_files if "can" in obj_file]
-
 
     def get_rand_tx_object(number_to_get=5, xy_scale=5, class_type="bottle"):
         """get random models from he asset folder"""
@@ -80,9 +75,12 @@ def generate_synthetic(
 
         return objects
 
-
-    bottles = get_rand_tx_object(number_to_get=num_bottles, xy_scale=xy_scale, class_type="bottle")
-    cans = get_rand_tx_object(number_to_get=num_cans, xy_scale=xy_scale, class_type="can")
+    bottles = get_rand_tx_object(
+        number_to_get=num_bottles, xy_scale=xy_scale, class_type="bottle"
+    )
+    cans = get_rand_tx_object(
+        number_to_get=num_cans, xy_scale=xy_scale, class_type="can"
+    )
 
     scene += bottles
     scene += cans
@@ -126,10 +124,12 @@ def generate_synthetic(
     )
 
     floor = kb.Cube(
-        name="floor", scale=(13.2, 13.2, 0.02), position=(0, 0, -0.02), material=material
+        name="floor",
+        scale=(13.2, 13.2, 0.02),
+        position=(0, 0, -0.02),
+        material=material,
     )
     scene += floor
-
 
     original_camera_position = (4.48113, -4.50764, 3.34367)
     r = np.sqrt(sum(a * a for a in original_camera_position))
@@ -158,7 +158,6 @@ def generate_synthetic(
         scene.camera.keyframe_insert("position", frame)
         scene.camera.keyframe_insert("quaternion", frame)
 
-
     # --- save scene for quick inspection
     renderer.save_state(f"{output_dir}/keyframing.blend")
 
@@ -170,30 +169,26 @@ def generate_synthetic(
     # --- save output files
     output_dir = kb.as_path(output_dir)
 
-
     # write rgb
     kb.file_io.write_rgba_batch(data_stack["rgba"], output_dir)
 
-    # write metadata including bounding boxes 
+    # write metadata including bounding boxes
     kb.compute_visibility(data_stack["segmentation"], scene.assets)
-    visible_foreground_assets = [asset for asset in scene.foreground_assets
-                                 if np.max(asset.metadata["visibility"]) > 0]
-
+    visible_foreground_assets = [
+        asset
+        for asset in scene.foreground_assets
+        if np.max(asset.metadata["visibility"]) > 0
+    ]
 
     kb.post_processing.compute_bboxes(
-        data_stack['segmentation'],
-        visible_foreground_assets
+        data_stack["segmentation"], visible_foreground_assets
     )
 
     kb.write_json(
-        filename = output_dir / 'metadata.json',
-        data = {
-            'instances': kb.get_instance_info(
-                scene, visible_foreground_assets
-            )
-        }
+        filename=output_dir / "metadata.json",
+        data={"instances": kb.get_instance_info(scene, visible_foreground_assets)},
     )
-    '''
+    """
     kb.compute_visibility(data_stack["segmentation"], scene.assets)
 
     bottles_segmentation = kb.adjust_segmentation_idxs(
@@ -214,26 +209,22 @@ def generate_synthetic(
 
     print(f'Unique segmentation idxs: {np.unique(data_stack["segmentation"])}')
     kb.file_io.write_segmentation_batch(data_stack["segmentation"], output_dir)
-    '''
-    
-if __name__ == '__main__':
+    """
 
+
+if __name__ == "__main__":
     num_generations = 2
 
     for i in range(num_generations):
-
-        output_dir = os.path.join('output', str(uuid.uuid4()))
+        output_dir = os.path.join("output", str(uuid.uuid4()))
 
         generate_synthetic(
             resolution=(50, 50),
             frame_start=1,
             frame_end=5,
             output_dir=output_dir,
-            num_cans=2,
-            num_bottles=2,
-            xy_scale=5,
-            tx_asset_directory = "/kubric/drink_detection_assigment"
+            num_cans=3,
+            num_bottles=3,
+            xy_scale=3,
+            tx_asset_directory="/kubric/drink_detection_assigment",
         )
-
-
-
