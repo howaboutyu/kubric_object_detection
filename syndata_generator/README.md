@@ -24,15 +24,15 @@ Classes:
 ## Tasks
 ### Kubric 
 
-[ ] create initial script with random objects on a plane
-[ ] add random lighting, camera fov
-[ ] add random motion blur
-[ ] add random lightin
-[ ] random background using hdri domes
-[ ] add random textures/objects 
+* [ ] create initial script with random objects on a plane
+* [ ] add random lighting, camera fov
+* [ ] add random motion blur
+* [ ] add random lightin
+* [ ] random background using hdri domes
+* [ ] add random textures/objects 
 
 ## Kubric to tfrecords
 
-[ ] create tfrecords from kubric data
+* [ ] create tfrecords from kubric data
 
 
