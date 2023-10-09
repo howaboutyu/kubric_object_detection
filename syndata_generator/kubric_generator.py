@@ -19,8 +19,10 @@ from utils import (
     create_walls,
 )
 
-logging.basicConfig(level="INFO")
 
+def get_random_gray_color():
+    v = np.random.uniform(0.2, 0.8)
+    return kb.Color(r=v, g=v, b=v, a=1.0)
 
 def generate_synthetic(
     resolution=(300, 300),
@@ -99,16 +101,6 @@ def generate_synthetic(
 
     scene += kb.PerspectiveCamera(name="camera", position=(3, -1, 4), look_at=(0, 0, 0))
 
-    # lamp_fill = kb.RectAreaLight(
-    #     name="lamp_fill",
-    #     color=color.Color.from_hexint(0xC2D0FF),
-    #     intensity=100,
-    #     width=0.5,
-    #     height=0.5,
-    #     position=(0, 0, 3.01122),
-    # )
-
-    # scene += lamp_fill
 
     def get_random_lights(num_lights=5):
         lights = []
@@ -147,7 +139,6 @@ def generate_synthetic(
     lights = get_random_lights(num_lights=7)
     scene += lights
 
-    # scene.ambient_illumination = kb.Color(1.05, 0.05, 0.05)
 
     # print('Adding hdri dome')
     # background_hdri = get_random_hdri()
@@ -155,14 +146,16 @@ def generate_synthetic(
     # scene += dome
     # print('Done adding hdri dome')
 
-    rng = np.random.RandomState()
-    scene += kb.assets.utils.get_clevr_lights(rng=rng)
+    # rng = np.random.RandomState()
+    # scene += kb.assets.utils.get_clevr_lights(rng=rng)
 
-    color_strategy = "uniform_hue"
-    color_label, random_color = randomness.sample_color(color_strategy)
-    logging.info(f"Floor color: {random_color}")
+
+    # --- add floor and walls
+    #color_strategy = "uniform_hue"
+    #color_label, random_color = randomness.sample_color(color_strategy)
+    floor_color =  get_random_gray_color() # kb.Color(r=0.5, g=0.5, b=0.5, a=1.0)
     floor_material = kb.PrincipledBSDFMaterial(
-        color=random_color,
+        color=floor_color,
         metallic=0.5,
         roughness=0.2,
         ior=2.5,
@@ -176,12 +169,10 @@ def generate_synthetic(
     )
     scene += floor
 
-    # --- add walls
 
-    color_label, random_color = randomness.sample_color(color_strategy)
-    logging.info(f"Wall color: {random_color}")
+    wall_color =  get_random_gray_color()  # kb.Color(r=0.5, g=0.5, b=0.5, a=1.0)
     wall_material = kb.PrincipledBSDFMaterial(
-        color=random_color,
+        color=wall_color,
         metallic=0.5,
         roughness=0.2,
         ior=2.5,
@@ -191,7 +182,7 @@ def generate_synthetic(
 
     original_camera_position = (4.48113, -4.50764, 3.34367)
     r = np.sqrt(sum(a * a for a in original_camera_position))
-
+    r += np.random.uniform(-0.5, 0.5)
     phi = np.arccos(original_camera_position[2] / r)
     theta = np.arccos(original_camera_position[0] / (r * np.sin(phi)))
     num_phi_values_per_theta = 1  # < only circular motion
@@ -220,9 +211,9 @@ def generate_synthetic(
     renderer.save_state(f"{output_dir}/keyframing.blend")
 
     # --- render the data
-    print("Rendering")
+    logging.info("Rendering")
     data_stack = renderer.render()
-    print("Done rendering")
+    logging.info("Done rendering")
 
     # --- save output files
     output_dir = kb.as_path(output_dir)
@@ -272,8 +263,11 @@ def generate_synthetic(
 
 def main():
     # TODO: Add argparse
+    print("Starting")
     tx_assignment_dir = "local"
+    logging.info(f"Downloading assets to {tx_assignment_dir}")
     download_and_unzip_gcs_zip(tx_assignment_dir)
+    logging.info(f"Done downloading assets to {tx_assignment_dir}")
 
     num_generation = 200
     for _ in range(num_generation):
