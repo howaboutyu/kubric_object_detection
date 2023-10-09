@@ -148,7 +148,7 @@ def generate_synthetic(
         x = r * np.cos(theta_new) * np.sin(phi)
         y = r * np.sin(theta_new) * np.sin(phi)
 
-        phi = np.random.uniform(0, np.pi / 4)
+        phi = np.random.uniform(np.pi / 4, np.pi/2 + np.pi/8)
         z = r * np.cos(phi)
         z_shift_direction = (i % num_phi_values_per_theta) - 1
         z = z + z_shift_direction * 1.2
@@ -221,7 +221,7 @@ if __name__ == "__main__":
         generate_synthetic(
             resolution=(50, 50),
             frame_start=1,
-            frame_end=5,
+            frame_end=10,
             output_dir=output_dir,
             num_cans=3,
             num_bottles=3,
