@@ -18,15 +18,12 @@ Several challenges are encountered in this project, including:
 
 ## Synthetic Data Generation Ideas
 
-To address these challenges, consider the following ideas for synthetic data generation:
+To address these challenges, here are some ideas for synthetic data generation:
 
 * Utilize Kubric for mask and bounding box data generation.
 * Explore Generative AI techniques for texture generation and regeneration.
 * Create synthetic object meshes to diversify the dataset.
 
-## Object Detection Approach
-
-For object detection, the project employs the `effdet` TensorFlow object detection API.
 
 ## Project Plan
 

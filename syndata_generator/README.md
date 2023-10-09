@@ -1,19 +1,18 @@
 # Synthetic Data Generation for Object Detection
 
-The objective of this project is to generate synthetic data to train an object detector capable of identifying bottles or cans within real-world images. Several synthetic data generation tools were considered, including Nvidia Omniverse, PyBullet, and Unity. After careful evaluation, Kubric emerged as a promising choice.
+The goal of this project is to generate synthetic data for training an object detector capable of identifying bottles or cans within real-world images. Kubric is a 3D simulation platform with an easy-to-use Python API that can import OBJ files with various textures. After simulating the scenes, Kubric can export useful information such as bounding boxes and segmentation masks.
 
-You can find more information about Kubric [here](https://github.com/google-research/kubric/blob/main/challenges/multiview_matting/worker.py).
+
+[kubric github](https://github.com/google-research/kubric/blob/main/challenges/multiview_matting/worker.py).
 
 ## Kubric Installation
 
 TODO
 
-## Kubric Output
+## Usage
 
-For Kubric, the following class mapping is applied:
+TODO
 
-1. Bottles - Class ID: 1
-2. Cans - Class ID: 2
 
 ## Tasks
 
@@ -29,4 +28,4 @@ For Kubric, the following class mapping is applied:
 
 ### Kubric to TFRecords
 
-- [ ] Develop a process to convert Kubric-generated data into TensorFlow Records (TFRecords) format, suitable for training an object detection model.
+- [x] Develop a process to convert Kubric-generated data into TensorFlow Records (TFRecords) format, suitable for training an object detection model.
