@@ -6,6 +6,8 @@ from kubric.core import color
 import glob
 import os
 import uuid
+import multiprocessing
+
 
 from utils import get_random_hdri, add_hdri_dome, sample_point_in_half_sphere_shell
 
@@ -211,20 +213,24 @@ def generate_synthetic(
     kb.file_io.write_segmentation_batch(data_stack["segmentation"], output_dir)
     """
 
+    
 
-if __name__ == "__main__":
-    num_generations = 2
-
-    for i in range(num_generations):
+def main():
+    num_generation = 200 
+    for _ in range(num_generation):
         output_dir = os.path.join("output", str(uuid.uuid4()))
-
-        generate_synthetic(
-            resolution=(50, 50),
+        num_cans = np.random.randint(1, 7)
+        num_bottles = np.random.randint(1, 7)
+        generate_synthetic(           
+            resolution=(320, 320),                              
             frame_start=1,
-            frame_end=10,
-            output_dir=output_dir,
-            num_cans=3,
-            num_bottles=3,
-            xy_scale=3,
-            tx_asset_directory="/kubric/drink_detection_assigment",
+            frame_end=10, 
+            output_dir=output_dir,      
+            num_cans=num_cans,             
+            num_bottles=num_bottles,             
+            xy_scale=3,            
+            tx_asset_directory="local/drink_detection_assigment"
         )
+   
+if __name__ == "__main__":
+    main()
