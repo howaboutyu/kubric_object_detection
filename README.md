@@ -1,41 +1,38 @@
-# telexistence_assignment
+# Telexistence Assignment Readme
 
-Tasks: 
-Use synthetic data to train an object detector used to detect bottles or cans.
+## Introduction
 
-This project can be broken down into two parts; synthetic data generation and object detection.
+This repository contains the code and resources for an object detection project focused on identifying bottles or cans using synthetic data. The project can be divided into two main components: synthetic data generation and object detection.
 
+## Challenges
 
+Several challenges are encountered in this project, including:
 
-Several challenges are presented: 
+* Variation in cameras, lighting conditions, backgrounds, and specular highlights.
+* Motion blur in the images.
+* Presence of objects other than bottles or cans.
+* Different environmental settings, such as items inside a fridge, on a table, or on a shelf.
+* Diverse material textures, including glass, plastic, and metal.
+* Varied object shapes, such as round, square, and cylindrical.
 
-* Different cameras, lighting, backgrounds, specular highlights
-* Motion blur
-* Has objects that are not bottles or cans
+## Synthetic Data Generation Ideas
 
-If we are using synthetic data it won't have any idea of 
+To address these challenges, consider the following ideas for synthetic data generation:
 
-### Ideas for synthetic data generation
+* Utilize Kubric for mask and bounding box data generation.
+* Explore Generative AI techniques for texture generation and regeneration.
+* Create synthetic object meshes to diversify the dataset.
 
-* Kubric - mask/bb data generation
-* Generative AI 
-    ** texture re/generation 
-    ** mesh generation
+## Object Detection Approach
 
+For object detection, the project employs the `effdet` TensorFlow object detection API.
 
-### Object detection
+## Project Plan
 
-* effdet tf object detection API
+The project plan is as follows:
 
-
-## Plan 
-
-* generate quick synthetic dataset from the `assets` folder using kubric and train an model with effdet to see
-
-
-## Tasks
-
-[ ] synthetic data generation
-[ ] object detection
-[ ] tests 
-[ ] report
+1. Generate a preliminary synthetic dataset using the assets provided in the `assets` folder.
+2. Utilize Kubric for mask and bounding box data generation.
+3. Train a model using the TensorFlow object detection API.
+4. Evaluate the model's performance with appropriate tests.
+5. Document the findings and outcomes in a report.
