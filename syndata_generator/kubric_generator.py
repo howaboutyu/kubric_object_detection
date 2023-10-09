@@ -25,6 +25,8 @@ logger.setLevel(logging.INFO)
 logger.addHandler(logging.StreamHandler(sys.stdout))
 logger.info("info")
 
+bpy_scene = bpy.context.scene
+
 
 def get_random_gray_color():
     v = np.random.uniform(0.2, 0.8)
@@ -97,7 +99,7 @@ def add_random_background(scene):
             ior=2.5,
         )
 
-        walls = create_walls(material=wall_material)
+        walls = create_walls(wall_distance=8, material=wall_material)
 
         scene += walls
     else:
@@ -130,9 +132,10 @@ def get_rand_tx_object(
         render_filename = np.random.choice(render_filenames)
 
         # load object
+        object_name = str(uuid.uuid4())
         object = kb.FileBasedObject(
             asset_id=class_type,
-            name=str(uuid.uuid4()),
+            name=object_name,
             position=(0, 0, 0),
             render_filename=render_filename,
         )
@@ -165,6 +168,8 @@ def generate_synthetic(
     xy_scale=5,
     tx_asset_directory="/kubric/drink_detection_assigment",
 ):
+    rng = np.random.RandomState()
+    logger.info(f"random seed: {rng.get_state()}")
     logging.info(f"Generating synthetic data in {output_dir}")
 
     scene = kb.Scene(
@@ -198,6 +203,53 @@ def generate_synthetic(
                 "Transmission"
             ].default_value = 1.0
 
+        if "label" in mat_name or "cap" in mat_name:
+            # --- Generate random procedural texture with Blender nodes
+            # from: kubric/challenges/texture_structure_nerf/worker.py
+            tree = mat.node_tree
+
+            mat_node = tree.nodes["Principled BSDF"]
+            ramp_node = tree.nodes.new(type="ShaderNodeValToRGB")
+            tex_node = tree.nodes.new(type="ShaderNodeTexNoise")
+            scaling_node = tree.nodes.new(type="ShaderNodeMapping")
+            rotation_node = tree.nodes.new(type="ShaderNodeMapping")
+            vector_node = tree.nodes.new(type="ShaderNodeNewGeometry")
+
+            tree.links.new(
+                vector_node.outputs["Position"], rotation_node.inputs["Vector"]
+            )
+            tree.links.new(
+                rotation_node.outputs["Vector"], scaling_node.inputs["Vector"]
+            )
+            tree.links.new(scaling_node.outputs["Vector"], tex_node.inputs["Vector"])
+            tree.links.new(tex_node.outputs["Fac"], ramp_node.inputs["Fac"])
+            tree.links.new(ramp_node.outputs["Color"], mat_node.inputs["Base Color"])
+
+            rotation_node.inputs["Rotation"].default_value = (
+                rng.uniform() * np.pi,
+                rng.uniform() * np.pi,
+                rng.uniform() * np.pi,
+            )
+
+            fpower = rng.uniform()
+            max_log_frequency = 3.0
+            min_log_frequency = -3.0
+            frequency = 10 ** (
+                fpower * (max_log_frequency - min_log_frequency) + min_log_frequency
+            )
+
+            scaling_node.inputs["Scale"].default_value = (
+                frequency,
+                frequency,
+                frequency,
+            )
+
+            for x in np.linspace(0.0, 1.0, 5)[1:-1]:
+                ramp_node.color_ramp.elements.new(x)
+
+            for element in ramp_node.color_ramp.elements:
+                element.color = kb.random_hue_color(rng=rng)
+
     # --- add camera
     scene += kb.PerspectiveCamera(name="camera", position=(3, -1, 4), look_at=(0, 0, 0))
 
@@ -205,7 +257,6 @@ def generate_synthetic(
     lights = get_random_lights(num_lights=np.random.randint(2, 7))
     scene += lights
 
-    rng = np.random.RandomState()
     scene += kb.assets.utils.get_clevr_lights(rng=rng)
 
     # --- add background
@@ -228,7 +279,7 @@ def generate_synthetic(
         x = r * np.cos(theta_new) * np.sin(phi)
         y = r * np.sin(theta_new) * np.sin(phi)
 
-        phi = np.random.uniform(np.pi / 8, np.pi / 2 - np.pi / 8)
+        phi = np.random.uniform(np.pi / 6, np.pi / 2)
         z = r * np.cos(phi)
         z_shift_direction = (i % num_phi_values_per_theta) - 1
         z = z + z_shift_direction * 1.2
@@ -306,9 +357,9 @@ if __name__ == "__main__":
         num_cans = np.random.randint(1, 7)
         num_bottles = np.random.randint(1, 7)
         generate_synthetic(
-            resolution=(640, 480),
+            resolution=(640 // 2, 480 // 2),
             frame_start=1,
-            frame_end=2,
+            frame_end=5,
             output_dir=output_dir,
             num_cans=num_cans,
             num_bottles=num_bottles,
