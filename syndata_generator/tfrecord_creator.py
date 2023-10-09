@@ -180,21 +180,11 @@ def kubric_session_to_tf_example(kubric_session_dir, tfrecord_output_dir):
             writer.write(example.SerializeToString())
 
 
-def write_label_map():
-    label_map_str = """item {
-  id: 1
-  name: 'bottles'
-  id: 2
-  name: 'cans'
 
-}"""
-
-    with open("label_map.pbtxt", "w") as f:
-        f.write(label_map_str)
 
 
 if __name__ == "__main__":
-    write_label_map()
+    #write_label_map()
     for kubric_session in kubric_sessions:
         kubric_session_dir = os.path.join(INPUT_DIR, kubric_session)
         kubric_session_to_tf_example(kubric_session_dir, "test_tfoutput")
