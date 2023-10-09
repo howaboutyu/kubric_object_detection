@@ -3,13 +3,21 @@ import kubric as kb
 import numpy as np
 from kubric.renderer.blender import Blender as KubricRenderer
 from kubric.core import color
+from kubric import randomness
 import glob
 import os
 import uuid
+
 import multiprocessing
 
 
-from utils import get_random_hdri, add_hdri_dome, sample_point_in_half_sphere_shell
+from utils import (
+    get_random_hdri,
+    add_hdri_dome,
+    sample_point_in_half_sphere_shell,
+    download_and_unzip_gcs_zip,
+    create_walls,
+)
 
 logging.basicConfig(level="INFO")
 
@@ -29,7 +37,9 @@ def generate_synthetic(
     scene = kb.Scene(
         resolution=resolution, frame_start=frame_start, frame_end=frame_end
     )
-    renderer = KubricRenderer(scene)
+    renderer = KubricRenderer(
+        scene, use_denoising=True, adaptive_sampling=False, background_transparency=True
+    )
 
     # scene += kb.Sphere(name="floor", scale=1000, position=(0, 0, +1000), background=True)
     # scene += kb.Cube(name="floor", scale=(0.5, 0.7, 1.0), position=(0, 0, 1.1))
@@ -100,13 +110,42 @@ def generate_synthetic(
 
     # scene += lamp_fill
 
-    scene += kb.DirectionalLight(
-        name="sun", position=(-1, -0.5, 3), look_at=(0, 0, 0), intensity=1.5
-    )
+    def get_random_lights(num_lights=5):
+        lights = []
 
-    scene += kb.DirectionalLight(
-        name="sun2", position=(1, 0.5, 3), look_at=(0, 0, 0), intensity=1.5
-    )
+        for _ in range(num_lights):
+            z = np.random.uniform(1.5, 3.5)
+            x = np.random.uniform(-5, 5)
+            y = np.random.uniform(-5, 5)
+            position = (x, y, z)
+
+            light_id = np.random.randint(0, 3)
+
+            if light_id == 0:
+                light = kb.PointLight(
+                    name="point_light_0", position=position, intensity=300.0
+                )
+            if light_id == 1:
+                light = kb.RectAreaLight(
+                    name="lamp_fill",
+                    color=color.Color.from_hexint(0xC2D0FF),
+                    intensity=100,
+                    width=0.5,
+                    height=0.5,
+                    position=position,
+                )
+
+            if light_id == 2:
+                light = kb.DirectionalLight(
+                    name="sun", position=position, look_at=(0, 0, 0), intensity=1.5
+                )
+
+            lights.append(light)
+
+        return lights
+
+    lights = get_random_lights(num_lights=7)
+    scene += lights
 
     # scene.ambient_illumination = kb.Color(1.05, 0.05, 0.05)
 
@@ -118,9 +157,13 @@ def generate_synthetic(
 
     rng = np.random.RandomState()
     scene += kb.assets.utils.get_clevr_lights(rng=rng)
-    material = kb.PrincipledBSDFMaterial(
-        color=kb.Color.from_hsv(rng.uniform(), rng.uniform(), 1),
-        metallic=1.0,
+
+    color_strategy = "uniform_hue"
+    color_label, random_color = randomness.sample_color(color_strategy)
+    logging.info(f"Floor color: {random_color}")
+    floor_material = kb.PrincipledBSDFMaterial(
+        color=random_color,
+        metallic=0.5,
         roughness=0.2,
         ior=2.5,
     )
@@ -129,9 +172,22 @@ def generate_synthetic(
         name="floor",
         scale=(13.2, 13.2, 0.02),
         position=(0, 0, -0.02),
-        material=material,
+        material=floor_material,
     )
     scene += floor
+
+    # --- add walls
+
+    color_label, random_color = randomness.sample_color(color_strategy)
+    logging.info(f"Wall color: {random_color}")
+    wall_material = kb.PrincipledBSDFMaterial(
+        color=random_color,
+        metallic=0.5,
+        roughness=0.2,
+        ior=2.5,
+    )
+
+    scene += create_walls(material=wall_material)
 
     original_camera_position = (4.48113, -4.50764, 3.34367)
     r = np.sqrt(sum(a * a for a in original_camera_position))
@@ -150,7 +206,7 @@ def generate_synthetic(
         x = r * np.cos(theta_new) * np.sin(phi)
         y = r * np.sin(theta_new) * np.sin(phi)
 
-        phi = np.random.uniform(np.pi / 4, np.pi/2 + np.pi/8)
+        phi = np.random.uniform(np.pi / 4, np.pi / 2 - np.pi / 8)
         z = r * np.cos(phi)
         z_shift_direction = (i % num_phi_values_per_theta) - 1
         z = z + z_shift_direction * 1.2
@@ -213,24 +269,28 @@ def generate_synthetic(
     kb.file_io.write_segmentation_batch(data_stack["segmentation"], output_dir)
     """
 
-    
 
 def main():
-    num_generation = 200 
+    # TODO: Add argparse
+    tx_assignment_dir = "local"
+    download_and_unzip_gcs_zip(tx_assignment_dir)
+
+    num_generation = 200
     for _ in range(num_generation):
         output_dir = os.path.join("output", str(uuid.uuid4()))
         num_cans = np.random.randint(1, 7)
         num_bottles = np.random.randint(1, 7)
-        generate_synthetic(           
-            resolution=(320, 320),                              
+        generate_synthetic(
+            resolution=(260, 260),
             frame_start=1,
-            frame_end=10, 
-            output_dir=output_dir,      
-            num_cans=num_cans,             
-            num_bottles=num_bottles,             
-            xy_scale=3,            
-            tx_asset_directory="local/drink_detection_assigment"
+            frame_end=5,
+            output_dir=output_dir,
+            num_cans=num_cans,
+            num_bottles=num_bottles,
+            xy_scale=3,
+            tx_asset_directory=f"{tx_assignment_dir}/drink_detection_assigment",
         )
-   
+
+
 if __name__ == "__main__":
     main()

@@ -109,3 +109,60 @@ def sample_point_in_half_sphere_shell(
 
         if inner_radius <= len_v <= outer_radius and correct_angle:
             return tuple(v)
+
+
+def create_walls(
+    center_x=0, center_y=0, wall_height=13.0, wall_distance=5.0, material=None
+):
+    """
+    Create four walls around a specified center point.
+
+    Args:
+        center_x (float): X-coordinate of the center point.
+        center_y (float): Y-coordinate of the center point.
+        wall_height (float): Height of the walls.
+        wall_distance (float): Distance of the walls from the center.
+        material (kb.Material): Material for the walls.
+
+    Returns:
+        List[kb.Cube]: List of the four wall objects.
+    """
+    walls = []
+
+    # Create the left wall
+    left_wall = kb.Cube(
+        name="left_wall",
+        scale=(0.02, wall_distance * 2, wall_height),
+        position=(center_x - wall_distance, center_y, wall_height / 2),
+        material=material,
+    )
+    walls.append(left_wall)
+
+    # Create the right wall
+    right_wall = kb.Cube(
+        name="right_wall",
+        scale=(0.02, wall_distance * 2, wall_height),
+        position=(center_x + wall_distance, center_y, wall_height / 2),
+        material=material,
+    )
+    walls.append(right_wall)
+
+    # Create the top wall
+    top_wall = kb.Cube(
+        name="top_wall",
+        scale=(wall_distance * 2, 0.02, wall_height),
+        position=(center_x, center_y + wall_distance, wall_height / 2),
+        material=material,
+    )
+    walls.append(top_wall)
+
+    # Create the bottom wall
+    bottom_wall = kb.Cube(
+        name="bottom_wall",
+        scale=(wall_distance * 2, 0.02, wall_height),
+        position=(center_x, center_y - wall_distance, wall_height / 2),
+        material=material,
+    )
+    walls.append(bottom_wall)
+
+    return walls
