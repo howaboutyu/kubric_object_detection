@@ -8,6 +8,7 @@ This repository contains the code and resources for an object detection project 
 
 Several challenges are encountered in this project, including:
 
+* Some objects in the testing images are not present in the assets folder.
 * Variation in cameras, lighting conditions, backgrounds, and specular highlights.
 * Motion blur in the images.
 * Presence of objects other than bottles or cans.
