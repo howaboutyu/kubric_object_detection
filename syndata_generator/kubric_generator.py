@@ -37,7 +37,7 @@ def get_random_lights(num_lights=5):
     lights = []
 
     for _ in range(num_lights):
-        z = np.random.uniform(1.5, 3.5)
+        z = np.random.uniform(0, 3.5)
         x = np.random.uniform(-5, 5)
         y = np.random.uniform(-5, 5)
         position = (x, y, z)
@@ -71,24 +71,10 @@ def get_random_lights(num_lights=5):
 def add_random_background(scene):
     """either add a hdri dome or a gray metalic background"""
 
-    if np.random.random() > 0.5:
+    if np.random.random() > 0.1:
         logger.info("Adding metalic dome")
         # --- add floor and walls
         floor_color = get_random_gray_color()  # kb.Color(r=0.5, g=0.5, b=0.5, a=1.0)
-        floor_material = kb.PrincipledBSDFMaterial(
-            color=floor_color,
-            metallic=0.5,
-            roughness=0.2,
-            ior=2.5,
-        )
-
-        floor = kb.Cube(
-            name="floor",
-            scale=(13.2, 13.2, 0.02),
-            position=(0, 0, -0.02),
-            material=floor_material,
-        )
-        scene += floor
 
         # color_label, random_color =
         wall_color = get_random_gray_color()  # kb.Color(r=0.5, g=0.5, b=0.5, a=1.0)
@@ -99,7 +85,7 @@ def add_random_background(scene):
             ior=2.5,
         )
 
-        walls = create_walls(wall_distance=8, material=wall_material)
+        walls = create_walls(wall_distance=13, material=wall_material)
 
         scene += walls
     else:
@@ -108,6 +94,21 @@ def add_random_background(scene):
         dome = add_hdri_dome(scene, background_hdri=background_hdri)
         scene += dome
         logger.info(f"Added hdri dome {background_hdri.filename}")
+
+    floor_material = kb.PrincipledBSDFMaterial(
+        color=floor_color,
+        metallic=0.5,
+        roughness=0.2,
+        ior=2.5,
+    )
+
+    floor = kb.Cube(
+        name="floor",
+        scale=(13.2, 13.2, 0.02),
+        position=(0, 0, -0.02),
+        material=floor_material,
+    )
+    scene += floor
 
 
 def get_rand_tx_object(
@@ -158,6 +159,55 @@ def get_rand_tx_object(
     return objects
 
 
+def place_objects_in_row(
+    number_to_get=5,
+    row_id=0,
+    x_spacing=1,
+    y_spacing=1,
+    class_type="bottle",
+    tx_asset_directory="",
+):
+    """Place models from the asset folder along a row."""
+
+    # TODO: move this glob out of the function
+    obj_files = glob.glob(os.path.join(tx_asset_directory, "**/*.obj"), recursive=True)
+
+    bottle_obj_files = [obj_file for obj_file in obj_files if "bottle" in obj_file]
+    can_obj_files = [obj_file for obj_file in obj_files if "can" in obj_file]
+
+    objects = []
+
+    if class_type == "bottle":
+        render_filenames = bottle_obj_files
+    elif class_type == "can":
+        render_filenames = can_obj_files
+
+    # Calculate the starting x position based on the number of objects and x_spacing
+    start_x = -0.5 * (number_to_get - 1) * x_spacing
+    render_filename = np.random.choice(render_filenames)
+    logger.info(f"Adding {render_filename} to row {row_id}")
+
+    for i in range(number_to_get):
+        # load object
+        object_name = str(uuid.uuid4())
+        object = kb.FileBasedObject(
+            asset_id=class_type,
+            name=object_name,
+            position=(0, 0, 0),
+            render_filename=render_filename,
+        )
+
+        # rotate object along x-axis
+        object.quaternion = kb.Quaternion(axis=(1, 0, 0), angle=np.pi / 2)
+
+        # set pos along x-y plane in a row
+        object.position = (start_x + i * x_spacing, row_id * y_spacing, 0)
+
+        objects.append(object)
+
+    return objects
+
+
 def generate_synthetic(
     resolution=(300, 300),
     frame_start=1,
@@ -167,6 +217,7 @@ def generate_synthetic(
     num_bottles=1,
     xy_scale=5,
     tx_asset_directory="/kubric/drink_detection_assigment",
+    generation_type="organized",  # generation type can be random or organized
 ):
     rng = np.random.RandomState()
     logger.info(f"random seed: {rng.get_state()}")
@@ -179,22 +230,46 @@ def generate_synthetic(
         scene, use_denoising=True, adaptive_sampling=False, background_transparency=True
     )
 
-    bottles = get_rand_tx_object(
-        number_to_get=num_bottles,
-        xy_scale=xy_scale,
-        class_type="bottle",
-        tx_asset_directory=tx_asset_directory,
-    )
-    cans = get_rand_tx_object(
-        number_to_get=num_cans,
-        xy_scale=xy_scale,
-        class_type="can",
-        tx_asset_directory=tx_asset_directory,
-    )
+    objects_to_add = []
 
-    scene += bottles
-    scene += cans
+    if generation_type == "random":
+        bottles = get_rand_tx_object(
+            number_to_get=num_bottles,
+            xy_scale=xy_scale,
+            class_type="bottle",
+            tx_asset_directory=tx_asset_directory,
+        )
+        cans = get_rand_tx_object(
+            number_to_get=num_cans,
+            xy_scale=xy_scale,
+            class_type="can",
+            tx_asset_directory=tx_asset_directory,
+        )
+        objects_to_add = bottles + cans
+    elif generation_type == "organized":
+        # scene += bottles
+        num_rows = 7
+        row_objects = []
+        for row_id in range(num_rows):
+            object_to_get = np.random.choice(["none", "bottle", "can"])
 
+            logging.info(f"generting row {row_id} with {object_to_get}")
+            if object_to_get == "none":
+                continue
+
+            row_object = place_objects_in_row(
+                number_to_get=np.random.randint(2, 9),
+                row_id=row_id,
+                x_spacing=1,
+                y_spacing=1,
+                class_type=object_to_get,
+            )
+
+            row_objects += row_object
+
+        objects_to_add = row_objects
+
+    scene += objects_to_add
     # make transparent material have transmission of 1
     for mat in bpy.data.materials:
         mat_name = mat.name
@@ -251,20 +326,24 @@ def generate_synthetic(
                 element.color = kb.random_hue_color(rng=rng)
 
     # --- add camera
-    scene += kb.PerspectiveCamera(name="camera", position=(3, -1, 4), look_at=(0, 0, 0))
 
     # --- add lights
     lights = get_random_lights(num_lights=np.random.randint(2, 7))
     scene += lights
 
-    scene += kb.assets.utils.get_clevr_lights(rng=rng)
+    if rng.uniform() > 0.5:
+        scene += kb.assets.utils.get_clevr_lights(rng=rng)
 
     # --- add background
     add_random_background(scene)
 
     original_camera_position = (5.48113, -5.50764, 3.34367)
+
+    scene += kb.PerspectiveCamera(
+        name="camera", position=original_camera_position, look_at=(0, 0, 0)
+    )
     r = np.sqrt(sum(a * a for a in original_camera_position))
-    r += np.random.uniform(-0.5, 0.5)
+    r += np.random.uniform(-0.5, 2.5)
     phi = np.arccos(original_camera_position[2] / r)
     theta = np.arccos(original_camera_position[0] / (r * np.sin(phi)))
     num_phi_values_per_theta = 1  # < only circular motion
@@ -285,7 +364,9 @@ def generate_synthetic(
         z = z + z_shift_direction * 1.2
 
         scene.camera.position = (x, y, z)
-        scene.camera.look_at((0, 0, 0))
+
+        rand_z_look_at = np.random.uniform(0, 2)
+        scene.camera.look_at((0, 0, rand_z_look_at))
         scene.camera.keyframe_insert("position", frame)
         scene.camera.keyframe_insert("quaternion", frame)
 
@@ -356,8 +437,11 @@ if __name__ == "__main__":
         output_dir = os.path.join("output", str(uuid.uuid4()))
         num_cans = np.random.randint(1, 7)
         num_bottles = np.random.randint(1, 7)
+        random_y_res = np.random.randint(300, 600)
+        random_x_res = np.random.randint(random_y_res, 600)  # ensure x_res >= y_res
+        resolution = (random_x_res, random_y_res)
         generate_synthetic(
-            resolution=(640 // 2, 480 // 2),
+            resolution=resolution,
             frame_start=1,
             frame_end=5,
             output_dir=output_dir,
@@ -365,4 +449,5 @@ if __name__ == "__main__":
             num_bottles=num_bottles,
             xy_scale=3,
             tx_asset_directory=f"{tx_assignment_dir}/drink_detection_assigment",
+            generation_type="organized",
         )
