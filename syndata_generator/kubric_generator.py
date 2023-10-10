@@ -251,7 +251,9 @@ def generate_synthetic(
         num_rows = 7
         row_objects = []
         for row_id in range(num_rows):
-            object_to_get = np.random.choice(["none", "bottle", "can"])
+            object_to_get = np.random.choice(
+                ["none", "bottle", "can"], p=[0.1, 0.4, 0.5]
+            )
 
             logging.info(f"generting row {row_id} with {object_to_get}")
             if object_to_get == "none":
@@ -278,7 +280,7 @@ def generate_synthetic(
                 "Transmission"
             ].default_value = 1.0
 
-        if "label" in mat_name or "cap" in mat_name:
+        if "liquid" in mat_name or "label" in mat_name or "cap" in mat_name:
             # --- Generate random procedural texture with Blender nodes
             # from: kubric/challenges/texture_structure_nerf/worker.py
             tree = mat.node_tree
@@ -337,7 +339,11 @@ def generate_synthetic(
     # --- add background
     add_random_background(scene)
 
-    original_camera_position = (5.48113, -5.50764, 3.34367)
+    original_camera_position = (
+        np.random.uniform(5, 7),
+        np.random.uniform(5, 7),
+        np.random.uniform(0, 5),
+    )
 
     scene += kb.PerspectiveCamera(
         name="camera", position=original_camera_position, look_at=(0, 0, 0)
