@@ -114,3 +114,24 @@ def add_image_texture(mat, image_path, seed=None):
     # Optionally, you can use the RNG to vary some properties for randomness:
     # Example: adjusting the roughness randomly
     mat_node.inputs["Roughness"].default_value = rng.uniform(0.1, 0.8)
+
+
+
+def apply_random_color(mat, seed=None):
+    # Initialize the RNG with the given seed
+    rng = np.random.default_rng(seed)
+
+    # Randomly generate RGB values
+    random_color = (rng.random(), rng.random(), rng.random())
+
+    # Get the node tree of the material
+    tree = mat.node_tree
+    
+    # Locate the Principled BSDF node
+    mat_node = tree.nodes["Principled BSDF"]
+    
+    # Set the Base Color of the Principled BSDF to the generated color
+    mat_node.inputs["Base Color"].default_value = (*random_color, 1.0)  # The 1.0 at the end is the alpha value
+
+    # Optionally: Adjust other material properties if desired
+    mat_node.inputs["Roughness"].default_value = rng.uniform(0.1, 0.8)
