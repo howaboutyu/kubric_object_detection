@@ -70,7 +70,7 @@ def add_floor(scene):
 
 
 def add_random_background(scene):
-    if 0: #rng.random() > 0.5:
+    if rng.random() > 0.5:
         add_metallic_dome(scene)
     else:
         add_hdri_background(scene)
