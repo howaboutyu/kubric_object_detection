@@ -6,10 +6,12 @@ from kubric.core import color
 import bpy
 
 import logging
+import uuid
 
 from object_generators import get_rand_tx_object, place_objects_in_row
 from environment_generators import get_random_lights, add_random_background
 from texture_generators import * 
+from utils import download_and_unzip_gcs_zip
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
@@ -27,8 +29,12 @@ def setup_scene(resolution, frame_start, frame_end):
 
 
 def setup_renderer(scene):
+    
     return KubricRenderer(
-        scene, use_denoising=False, adaptive_sampling=True, background_transparency=True
+        scene, 
+        use_denoising=rng.choice([True, False]), 
+        adaptive_sampling=rng.choice([True, False]), 
+        background_transparency=rng.choice([True, False])
     )
 
 
@@ -52,7 +58,7 @@ def setup_objects_in_scene(
         )
         objects_to_add = bottles + cans
     elif generation_type == "organized":
-        num_rows = 2
+        num_rows = 6 
         row_objects = []
         for row_id in range(num_rows):
             object_to_get = rng.choice(["none", "bottle", "can"], p=[0.1, 0.4, 0.5])
@@ -115,7 +121,7 @@ def adjust_material_properties(texture_dir=None):
         mat_name = mat.name
         if "transparent" in mat_name or "liquid" in mat_name:
             mat.node_tree.nodes["Principled BSDF"].inputs["Transmission"].default_value = 1.0
-        elif "label" in mat_name:
+        elif "label" in mat_name or "cap" in mat_name:
             logger.info(f'Adjusting material properties for {mat_name}')
             
             # Randomly select an image from the folder
@@ -124,6 +130,9 @@ def adjust_material_properties(texture_dir=None):
             
             # Add the image texture to the material
             add_image_texture(mat, image_path=selected_image_path)
+        
+        elif "liquid" in mat_name :
+            apply_random_color(mat)
 
 def setup_camera(scene):
 
@@ -132,8 +141,8 @@ def setup_camera(scene):
     random_sensor_width = rng.uniform(30, 40)
 
     original_camera_position = (
-        rng.uniform(4, 7),
-        rng.uniform(4, 7),
+        rng.uniform(6, 9),
+        rng.uniform(6, 9),
         rng.uniform(2, 4),
     )
 
@@ -225,4 +234,29 @@ def generate_synthetic(
 
 
 if __name__ == "__main__":
-    generate_synthetic()
+    # TODO: Add argparse
+    print("Starting")
+    tx_assignment_dir = "local"
+    logger.info(f"Downloading assets to {tx_assignment_dir}")
+    download_and_unzip_gcs_zip(tx_assignment_dir)
+    logger.info(f"Done downloading assets to {tx_assignment_dir}")
+
+    num_generation = 2000
+    for _ in range(num_generation):
+        output_dir = os.path.join("output_organized", str(uuid.uuid4()))
+        num_cans = np.random.randint(1, 7)
+        num_bottles = np.random.randint(1, 7)
+        random_y_res = np.random.randint(300, 500)
+        random_x_res = np.random.randint(random_y_res, 600)  # ensure x_res >= y_res
+        resolution = (random_x_res, random_y_res)
+        generate_synthetic(
+            resolution=resolution,
+            frame_start=1,
+            frame_end=10,
+            output_dir=output_dir,
+            num_cans=num_cans,
+            num_bottles=num_bottles,
+            xy_scale=3,
+            tx_asset_directory=f"{tx_assignment_dir}/drink_detection_assigment",
+            generation_type=rng.choice(["random", "organized"], p=[0.5, 0.5]),
+        )
