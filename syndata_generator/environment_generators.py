@@ -75,7 +75,7 @@ def add_random_background(scene):
     else:
         add_hdri_background(scene)
 
-    add_floor(scene)
+    if rng.random() > 0.5 : add_floor(scene)
 
 
 def random_position_within_bounds(x_bound=(-5, 5), y_bound=(-5, 5), z_bound=(0, 3.5)):
