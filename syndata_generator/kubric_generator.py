@@ -221,7 +221,7 @@ def generate_synthetic(
     generation_type="organized",
     texture_dir='generated_textures',
 ):
-    logger.info(f"Generating synthetic data in {output_dir}")
+    logger.info(f"Generating synthetic data, saving output to -> {output_dir}")
     scene = setup_scene(resolution, frame_start, frame_end)
     renderer = setup_renderer(scene)
     
@@ -234,16 +234,19 @@ def generate_synthetic(
 
 
 if __name__ == "__main__":
-    # TODO: Add argparse
-    print("Starting")
-    tx_assignment_dir = "local"
-    logger.info(f"Downloading assets to {tx_assignment_dir}")
-    download_and_unzip_gcs_zip(tx_assignment_dir)
-    logger.info(f"Done downloading assets to {tx_assignment_dir}")
+    parser = argparse.ArgumentParser(description='Generate synthetic images with random textures.')
+    parser.add_argument('--tx-assignment-dir', type=str, default='local', help='Directory for texture assignment')
+    parser.add_argument('--num-generation', type=int, default=2000, help='Number of images to generate')
+    parser.add_argument('--output-path', type=str, default='random_texture', help='Path to save generated images')
+    
+    args = parser.parse_args()
 
-    num_generation = 2000
-    for _ in range(num_generation):
-        output_dir = os.path.join("output_organized", str(uuid.uuid4()))
+    logger.info(f"Downloading assets to {args.tx_assignment_dir}")
+    download_and_unzip_gcs_zip(args.tx_assignment_dir)
+    logger.info(f"Done downloading assets to {args.tx_assignment_dir}")
+
+    for _ in range(args.num_generation):
+        output_dir = os.path.join(args.output_path, str(uuid.uuid4()))
         num_cans = np.random.randint(1, 7)
         num_bottles = np.random.randint(1, 7)
         random_y_res = np.random.randint(300, 500)
@@ -257,6 +260,6 @@ if __name__ == "__main__":
             num_cans=num_cans,
             num_bottles=num_bottles,
             xy_scale=3,
-            tx_asset_directory=f"{tx_assignment_dir}/drink_detection_assigment",
-            generation_type=rng.choice(["random", "organized"], p=[0.5, 0.5]),
+            tx_asset_directory=f"{args.tx_assignment_dir}/drink_detection_assigment",
+            generation_type=np.random.choice(["random", "organized"], p=[0.5, 0.5]),
         )
