@@ -10,7 +10,7 @@ logger = logging.getLogger(__name__)
 
 def get_object_files(class_type, tx_asset_directory):
     obj_files = glob.glob(os.path.join(tx_asset_directory, "**/*.obj"), recursive=True)
-    
+
     if class_type == "bottle":
         return [obj_file for obj_file in obj_files if "bottle" in obj_file]
     elif class_type == "can":

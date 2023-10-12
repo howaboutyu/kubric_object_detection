@@ -11,7 +11,7 @@ import uuid
 
 from object_generators import get_rand_tx_object, place_objects_in_row
 from environment_generators import get_random_lights, add_random_background
-from texture_generators import * 
+from texture_generators import *
 from utils import download_and_unzip_gcs_zip
 
 logger = logging.getLogger(__name__)
@@ -30,12 +30,11 @@ def setup_scene(resolution, frame_start, frame_end):
 
 
 def setup_renderer(scene):
-    
     return KubricRenderer(
-        scene, 
-        use_denoising=rng.choice([True, False]), 
-        adaptive_sampling=rng.choice([True, False]), 
-        background_transparency=rng.choice([True, False])
+        scene,
+        use_denoising=rng.choice([True, False]),
+        adaptive_sampling=rng.choice([True, False]),
+        background_transparency=rng.choice([True, False]),
     )
 
 
@@ -59,7 +58,7 @@ def setup_objects_in_scene(
         )
         objects_to_add = bottles + cans
     elif generation_type == "organized":
-        num_rows = 6 
+        num_rows = 6
         row_objects = []
         for row_id in range(num_rows):
             object_to_get = rng.choice(["none", "bottle", "can"], p=[0.1, 0.4, 0.5])
@@ -78,7 +77,8 @@ def setup_objects_in_scene(
 
 
 def setup_lights_in_scene(scene):
-    logger.info('Adding lights to scene')
+    logger.info("Adding lights to scene")
+    # TODO : add args
     lights = get_random_lights(num_lights=rng.randint(2, 7))
     scene += lights
     if rng.uniform() > 0.5:
@@ -101,7 +101,7 @@ def setup_lights_in_scene(scene):
 #             #add_random_musgrave(mat)
 #             #add_random_perlin_noise(mat)
 #             add_image_texture(mat, image_path="/kubric/syndata_generator/output/rgba_00001.png")
-        
+
 
 def adjust_material_properties(texture_dir=None):
     if not texture_dir:
@@ -109,11 +109,15 @@ def adjust_material_properties(texture_dir=None):
         return
 
     # Get all files in the specified directory
-    all_files = [f for f in os.listdir(texture_dir) if os.path.isfile(os.path.join(texture_dir, f))]
-    
+    all_files = [
+        f
+        for f in os.listdir(texture_dir)
+        if os.path.isfile(os.path.join(texture_dir, f))
+    ]
+
     # Filter only image files (assuming PNG and JPG formats)
-    image_files = [f for f in all_files if f.endswith(('.png', '.jpg'))]
-    
+    image_files = [f for f in all_files if f.endswith((".png", ".jpg"))]
+
     if not image_files:
         logger.error("No image files found in the specified directory!")
         return
@@ -121,23 +125,23 @@ def adjust_material_properties(texture_dir=None):
     for mat in bpy.data.materials:
         mat_name = mat.name
         if "transparent" in mat_name or "liquid" in mat_name:
-            mat.node_tree.nodes["Principled BSDF"].inputs["Transmission"].default_value = 1.0
-            if "liquid" in mat_name :
+            mat.node_tree.nodes["Principled BSDF"].inputs[
+                "Transmission"
+            ].default_value = 1.0
+            if "liquid" in mat_name:
                 apply_random_color(mat)
         elif "label" in mat_name or "cap" in mat_name:
-            logger.info(f'Adjusting material properties for {mat_name}')
-            
+            logger.info(f"Adjusting material properties for {mat_name}")
+
             # Randomly select an image from the folder
             selected_image = rng.choice(image_files)
             selected_image_path = os.path.join(texture_dir, selected_image)
-            
+
             # Add the image texture to the material
             add_image_texture(mat, image_path=selected_image_path)
-        
-        
+
 
 def setup_camera(scene):
-
     # Randomly set focal_length and sensor_width
     random_focal_length = rng.uniform(40, 60)
     random_sensor_width = rng.uniform(30, 40)
@@ -155,7 +159,6 @@ def setup_camera(scene):
         sensor_width=random_sensor_width,
     )
 
-
     # Circular motion
     r = np.sqrt(sum(a * a for a in original_camera_position))
     phi = np.arccos(original_camera_position[2] / r)
@@ -170,7 +173,7 @@ def setup_camera(scene):
         z = original_camera_position[2] + rng.uniform(-0.2, 0.2)
 
         scene.camera.position = (x, y, z)
-   
+
         # Common code for look_at and keyframes
         rand_z_look_at = rng.uniform(0, 2)
         scene.camera.look_at((0, 0, rand_z_look_at))
@@ -179,8 +182,6 @@ def setup_camera(scene):
 
 
 def render_and_save_data(renderer, scene, output_dir):
-
-
     renderer.save_state(f"{output_dir}/keyframing.blend")
 
     logger.info("Rendering")
@@ -221,13 +222,15 @@ def generate_synthetic(
     xy_scale=5,
     tx_asset_directory="local/drink_detection_assigment",
     generation_type="organized",
-    texture_dir='generated_textures',
+    texture_dir="generated_textures",
 ):
     logger.info(f"Generating synthetic data, saving output to -> {output_dir}")
     scene = setup_scene(resolution, frame_start, frame_end)
     renderer = setup_renderer(scene)
-    
-    setup_objects_in_scene(scene, num_cans, num_bottles, xy_scale, tx_asset_directory, generation_type)
+
+    setup_objects_in_scene(
+        scene, num_cans, num_bottles, xy_scale, tx_asset_directory, generation_type
+    )
     setup_lights_in_scene(scene)
     adjust_material_properties(texture_dir=texture_dir)
     setup_camera(scene)
@@ -236,11 +239,32 @@ def generate_synthetic(
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description='Generate synthetic images with random textures.')
-    parser.add_argument('--tx-assignment-dir', type=str, default='local', help='Directory for texture assignment')
-    parser.add_argument('--num-generation', type=int, default=2000, help='Number of images to generate')
-    parser.add_argument('--output-path', type=str, default='random_texture', help='Path to save generated images')
-    
+    parser = argparse.ArgumentParser(
+        description="Generate synthetic images with random textures."
+    )
+    parser.add_argument(
+        "--tx-assignment-dir",
+        type=str,
+        default="tx_assignment_data",
+        help="Directory for original assignment data",
+    )
+    parser.add_argument(
+        "--num-generation", type=int, default=2000, help="Number of images to generate"
+    )
+    parser.add_argument(
+        "--output-path",
+        type=str,
+        default="kubric_synthetic_data_output",
+        help="Path to save generated images and annotations",
+    )
+
+    parser.add_argument(
+        "--texture-dir",
+        type=str,
+        default="generated_textures_sd2",
+        help="Path to generated texture images ",
+    )
+
     args = parser.parse_args()
 
     logger.info(f"Downloading assets to {args.tx_assignment_dir}")
@@ -251,7 +275,7 @@ if __name__ == "__main__":
         output_dir = os.path.join(args.output_path, str(uuid.uuid4()))
         num_cans = np.random.randint(1, 7)
         num_bottles = np.random.randint(1, 7)
-        random_y_res = np.random.randint(250,  400)
+        random_y_res = np.random.randint(250, 400)
         random_x_res = np.random.randint(random_y_res, 500)  # ensure x_res >= y_res
         resolution = (random_x_res, random_y_res)
         generate_synthetic(
@@ -264,4 +288,5 @@ if __name__ == "__main__":
             xy_scale=3,
             tx_asset_directory=f"{args.tx_assignment_dir}/drink_detection_assigment",
             generation_type=np.random.choice(["random", "organized"], p=[0.5, 0.5]),
+            texture_dir=args.texture_dir,
         )

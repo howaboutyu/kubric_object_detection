@@ -46,7 +46,7 @@ def add_hdri_background(scene):
 
     background_hdri = get_random_hdri()
     dome = add_hdri_dome(scene, background_hdri=background_hdri)
-    #scene += dome
+    # scene += dome
 
     logger.info(f"Added hdri dome {background_hdri.filename}")
 
@@ -75,7 +75,8 @@ def add_random_background(scene):
     else:
         add_hdri_background(scene)
 
-    if rng.random() > 0.5 : add_floor(scene)
+    if rng.random() > 0.5:
+        add_floor(scene)
 
 
 def random_position_within_bounds(x_bound=(-5, 5), y_bound=(-5, 5), z_bound=(0, 3.5)):

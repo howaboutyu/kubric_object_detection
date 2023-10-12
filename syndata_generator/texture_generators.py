@@ -1,6 +1,7 @@
 import numpy as np
 import bpy
 
+
 def add_random_voronoi(mat, seed=None):
     # Initialize the RNG with the given seed
     rng = np.random.default_rng(seed)
@@ -25,10 +26,10 @@ def add_random_voronoi(mat, seed=None):
     voronoi_node.inputs["Randomness"].default_value = rng.uniform(0.0, 1.0)
 
     # For setting feature and distance
-    feature_options = ['F1', 'F2', 'SMOOTH_F1', 'DISTANCE_TO_EDGE', 'N_SPHERE_RADIUS']
+    feature_options = ["F1", "F2", "SMOOTH_F1", "DISTANCE_TO_EDGE", "N_SPHERE_RADIUS"]
     voronoi_node.feature = rng.choice(feature_options)
 
-    distance_options = ['EUCLIDEAN', 'MANHATTAN', 'CHEBYCHEV', 'MINKOWSKI']
+    distance_options = ["EUCLIDEAN", "MANHATTAN", "CHEBYCHEV", "MINKOWSKI"]
     voronoi_node.distance = rng.choice(distance_options)
 
 
@@ -58,11 +59,14 @@ def add_random_musgrave(mat, seed=None):
     musgrave_node.inputs["Gain"].default_value = rng.uniform(0.0, 6.0)
 
     # For setting type
-    type_options =['MULTIFRACTAL', 'RIDGED_MULTIFRACTAL', 'HYBRID_MULTIFRACTAL', 'FBM', 'HETERO_TERRAIN'] 
+    type_options = [
+        "MULTIFRACTAL",
+        "RIDGED_MULTIFRACTAL",
+        "HYBRID_MULTIFRACTAL",
+        "FBM",
+        "HETERO_TERRAIN",
+    ]
     musgrave_node.musgrave_type = rng.choice(type_options)
-
-
-
 
 
 def add_random_perlin_noise(mat, seed=None):
@@ -84,8 +88,12 @@ def add_random_perlin_noise(mat, seed=None):
 
     # Randomly set the Noise settings using RNG
     noise_node.inputs["Scale"].default_value = rng.uniform(1.0, 10.0)
-    noise_node.inputs["Detail"].default_value = rng.uniform(0.0, 10.0) # detail level of the noise
-    noise_node.inputs["Distortion"].default_value = rng.uniform(0.0, 2.0) # distortion of the noise
+    noise_node.inputs["Detail"].default_value = rng.uniform(
+        0.0, 10.0
+    )  # detail level of the noise
+    noise_node.inputs["Distortion"].default_value = rng.uniform(
+        0.0, 2.0
+    )  # distortion of the noise
 
     # Adjusting the roughness based on the noise can give interesting results
     mat_node.inputs["Roughness"].default_value = rng.uniform(0.1, 0.8)
@@ -116,7 +124,6 @@ def add_image_texture(mat, image_path, seed=None):
     mat_node.inputs["Roughness"].default_value = rng.uniform(0.1, 0.8)
 
 
-
 def apply_random_color(mat, seed=None):
     # Initialize the RNG with the given seed
     rng = np.random.default_rng(seed)
@@ -126,12 +133,15 @@ def apply_random_color(mat, seed=None):
 
     # Get the node tree of the material
     tree = mat.node_tree
-    
+
     # Locate the Principled BSDF node
     mat_node = tree.nodes["Principled BSDF"]
-    
+
     # Set the Base Color of the Principled BSDF to the generated color
-    mat_node.inputs["Base Color"].default_value = (*random_color, 1.0)  # The 1.0 at the end is the alpha value
+    mat_node.inputs["Base Color"].default_value = (
+        *random_color,
+        1.0,
+    )  # The 1.0 at the end is the alpha value
 
     # Optionally: Adjust other material properties if desired
     mat_node.inputs["Roughness"].default_value = rng.uniform(0.1, 0.8)

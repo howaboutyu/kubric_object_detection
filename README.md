@@ -4,6 +4,35 @@
 
 This repository contains the code and resources for an object detection project focused on identifying bottles or cans using synthetic data. The project can be divided into two main components: synthetic data generation and object detection.
 
+
+## Setup
+
+
+```bash
+sudo docker pull kubricdockerhub/kubruntu
+sudo docker build . --tag=gpu_docker_tf2 -f Dockerfile.gpu
+```
+
+
+## Ussage
+
+### random texture generation
+
+
+
+### syntehtic data generation
+
+
+```
+docker run -it \
+        -v `pwd`:/kubric \
+        kubricdockerhub/kubruntu python /kubric/syndata_generator/kubric_generator.py \
+        --texture-dir syndata_generator/generated_textures  \
+        --output-path kubric_synthetic_data_output \
+        --num-generation 2000
+```
+
+### Training
 ## Challenges
 
 Several challenges are encountered in this project, including:
