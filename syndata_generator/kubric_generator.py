@@ -1,6 +1,7 @@
 import os
 import numpy as np
 import kubric as kb
+import argparse
 from kubric.renderer.blender import Blender as KubricRenderer
 from kubric.core import color
 import bpy
@@ -121,6 +122,8 @@ def adjust_material_properties(texture_dir=None):
         mat_name = mat.name
         if "transparent" in mat_name or "liquid" in mat_name:
             mat.node_tree.nodes["Principled BSDF"].inputs["Transmission"].default_value = 1.0
+            if "liquid" in mat_name :
+                apply_random_color(mat)
         elif "label" in mat_name or "cap" in mat_name:
             logger.info(f'Adjusting material properties for {mat_name}')
             
@@ -131,8 +134,7 @@ def adjust_material_properties(texture_dir=None):
             # Add the image texture to the material
             add_image_texture(mat, image_path=selected_image_path)
         
-        elif "liquid" in mat_name :
-            apply_random_color(mat)
+        
 
 def setup_camera(scene):
 
@@ -249,8 +251,8 @@ if __name__ == "__main__":
         output_dir = os.path.join(args.output_path, str(uuid.uuid4()))
         num_cans = np.random.randint(1, 7)
         num_bottles = np.random.randint(1, 7)
-        random_y_res = np.random.randint(300, 500)
-        random_x_res = np.random.randint(random_y_res, 600)  # ensure x_res >= y_res
+        random_y_res = np.random.randint(250,  400)
+        random_x_res = np.random.randint(random_y_res, 500)  # ensure x_res >= y_res
         resolution = (random_x_res, random_y_res)
         generate_synthetic(
             resolution=resolution,
