@@ -1,5 +1,7 @@
-git clone  https://github.com/google-research/kubric.git 
-cd kubric && git checkout a749598fd84f7265c130dd41f37ebcbc6bba0c65 && cd ..
 docker run -it \
 	-v `pwd`:/kubric \
-	kubricdockerhub/kubruntu bash
+	kubricdockerhub/kubruntu python /kubric/syndata_generator/kubric_generator.py \
+	--texture-dir syndata_generator/generated_textures  \
+	--output-path kubric_synthetic_data_output \
+	--num-generation 2000
+

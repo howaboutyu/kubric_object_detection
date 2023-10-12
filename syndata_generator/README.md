@@ -19,12 +19,12 @@ TODO
 ### Kubric
 
 - [x] Create an initial script that generates scenes with random objects placed on a plane.
-- [ ] Introduce random lighting conditions and adjust camera field of view (FOV) to diversify the dataset.
+- [x] Introduce random lighting conditions and adjust camera field of view (FOV) to diversify the dataset.
 - [ ] Implement random motion blur to simulate real-world scenarios.
-- [ ] Incorporate random lighting variations.
+- [x] Incorporate random lighting variations.
 - [ ] Add random distractor objects to enhance the dataset's complexity.
-- [ ] Explore the use of HDRI domes for generating random background environments.
-- [ ] Include textures and objects resembling cans and bottles to simulate real-world appearances.
+- [x] Explore the use of HDRI domes for generating random background environments.
+- [x] Generate textures using generative AI methods. 
 
 ### Kubric to TFRecords
 

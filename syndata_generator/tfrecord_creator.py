@@ -17,7 +17,7 @@ OUTPUT_DIR:
     kubric_session_2.tfrecord
 """
 
-
+import glob
 import os
 import numpy as np
 import tensorflow as tf
@@ -26,13 +26,13 @@ import io
 import json
 import hashlib
 from collections import defaultdict
-import tfrecord_utils as dataset_util
 import logging
-
+import argparse
 import pathlib
 
-INPUT_DIR = "output"
-kubric_sessions = os.listdir(INPUT_DIR)
+
+import tfrecord_utils as dataset_util
+
 
 logging.basicConfig(level="INFO")
 
@@ -138,8 +138,7 @@ def frame_to_example(image_path, frame_dict):
     return example
 
 
-def kubric_session_to_tf_example(kubric_session_dir, tfrecord_output_dir):
-    session_id = os.path.basename(kubric_session_dir)
+def kubric_session_to_tf_example(kubric_session_dir):
     logging.info(f"Processing {kubric_session_dir}")
 
     all_files = [f for f in os.listdir(kubric_session_dir) if f.endswith(".png")]
@@ -148,7 +147,8 @@ def kubric_session_to_tf_example(kubric_session_dir, tfrecord_output_dir):
     json_file = os.path.join(kubric_session_dir, "metadata.json")
 
     if os.path.exists(json_file) == False:
-        raise ValueError(f"json file {json_file} does not exist")
+        logging.error(f"json file {json_file} does not exist")
+        return []
 
     metadata_nested_dict = read_metadata(json_file)
 
@@ -160,7 +160,7 @@ def kubric_session_to_tf_example(kubric_session_dir, tfrecord_output_dir):
         image_path = os.path.join(kubric_session_dir, rgba_file)
 
         if frame not in metadata_nested_dict:
-            raise ValueError(f"frame {frame} not found in metadata")
+            continue
 
         frame_dict = metadata_nested_dict[frame]
 
@@ -168,23 +168,69 @@ def kubric_session_to_tf_example(kubric_session_dir, tfrecord_output_dir):
 
         example_list.append(example)
 
-    output_file = os.path.join(
-        tfrecord_output_dir, f"kubric_session_{session_id}.tfrecord"
-    )
+    return example_list
 
+
+def write_to_shards(session_dir_list, tfrecord_output_dir, num_writers, suffix=""):
     if not os.path.exists(tfrecord_output_dir):
         os.makedirs(tfrecord_output_dir)
-    logging.info(f"Writing session {session_id} to {output_file}")
-    with tf.io.TFRecordWriter(output_file) as writer:
+
+    tfrecord_files = [
+        os.path.join(tfrecord_output_dir, f"shard_{i}_{suffix}.tfrecords")
+        for i in range(num_writers)
+    ]
+
+    writers = [tf.io.TFRecordWriter(output_file) for output_file in tfrecord_files]
+
+    for session_dir in session_dir_list:
+        session_id = os.path.basename(session_dir)
+        logging.info(f"Writing session {session_id} to shard ")
+
+        example_list = kubric_session_to_tf_example(session_dir)
+
         for example in example_list:
-            writer.write(example.SerializeToString())
+            writers[np.random.randint(0, num_writers)].write(
+                example.SerializeToString()
+            )
 
-
-
+    for writer in writers:
+        writer.close()
 
 
 if __name__ == "__main__":
-    #write_label_map()
-    for kubric_session in kubric_sessions:
-        kubric_session_dir = os.path.join(INPUT_DIR, kubric_session)
-        kubric_session_to_tf_example(kubric_session_dir, "test_tfoutput")
+    parser = argparse.ArgumentParser(
+        description="Process the input directory and output folder."
+    )
+    parser.add_argument(
+        "--input-dir",
+        type=str,
+        default="output_organized",
+        help="Input directory containing sessions.",
+    )
+    parser.add_argument(
+        "--output-folder",
+        type=str,
+        default="test_shards",
+        help="Folder where output shards will be saved.",
+    )
+    parser.add_argument(
+        "--train-val-split",
+        type=float,
+        default=0.9,
+        help="Proportion of training data to total data.",
+    )
+    args = parser.parse_args()
+
+    logging.info(f"Input directory set to: {args.input_dir}")
+    logging.info(f"Output folder set to: {args.output_folder}")
+    logging.info(f"Train-validation split ratio: {args.train_val_split}")
+
+    session_dir_list = glob.glob(os.path.join(args.input_dir, "*"))
+
+    num_sessions = len(session_dir_list)
+
+    train_list = session_dir_list[: int(args.train_val_split * num_sessions)]
+    val_list = session_dir_list[int(args.train_val_split * num_sessions) :]
+
+    write_to_shards(train_list, args.output_folder, 10, "train")
+    write_to_shards(val_list, args.output_folder, 2, "val")
