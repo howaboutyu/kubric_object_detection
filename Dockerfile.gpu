@@ -1,0 +1,23 @@
+# Use NVIDIA's TensorFlow container as the base image
+FROM nvcr.io/nvidia/tensorflow:23.09-tf2-py3
+
+# Update and install required packages
+RUN apt update && \
+    apt install -y protobuf-compiler  ffmpeg libsm6 libxext6  && \
+    pip install tf-models-official==2.13.2
+
+# tf2 object detection setup 
+RUN git clone --depth 1 https://github.com/tensorflow/models /tf/models
+
+WORKDIR /tf/models/research
+
+RUN protoc object_detection/protos/*.proto --python_out=. && \
+    cp object_detection/packages/tf2/setup.py . && \
+    pip install .
+
+
+# pytorch setup for huggingface diffusers
+RUN pip install torch diffusers transformers
+
+CMD ["bash"]
+
