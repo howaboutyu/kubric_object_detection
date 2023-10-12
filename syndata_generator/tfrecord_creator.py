@@ -31,8 +31,6 @@ import logging
 
 import pathlib
 
-INPUT_DIR = "output"
-kubric_sessions = os.listdir(INPUT_DIR)
 
 logging.basicConfig(level="INFO")
 
@@ -179,12 +177,16 @@ def kubric_session_to_tf_example(kubric_session_dir, tfrecord_output_dir):
         for example in example_list:
             writer.write(example.SerializeToString())
 
-
-
-
-
 if __name__ == "__main__":
-    #write_label_map()
-    for kubric_session in kubric_sessions:
-        kubric_session_dir = os.path.join(INPUT_DIR, kubric_session)
-        kubric_session_to_tf_example(kubric_session_dir, "test_tfoutput")
+    INPUT_DIR = "output_organized"
+    kubric_sessions = os.listdir(INPUT_DIR)
+
+
+    session_dir_list = glob.glob(os.path.join(INPUT_DIR, '*'))
+    print(session_dir_list)
+
+    num_sessions = len(session_dir_list)
+    train_val_split = 0.9
+
+    output_folder = 'test_shards_organized'
+
