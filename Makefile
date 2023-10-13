@@ -5,10 +5,14 @@ IMAGE_NAME := gpu_docker_tf2
 DOCKERFILE := Dockerfile.gpu
 KUBRIC_IMAGE := kubricdockerhub/kubruntu
 TRAIN_SCRIPT := /tf/models/research/object_detection/model_main_tf2.py
-PIPELINE_CONFIG_PATH := /workspace/tx-trainer/object_detector/effdet0.config
-MODEL_DIR := /workspace/tx-trainer/models/effdet0
+
 PROMPT := "Design a texture image for a label for a beverage [beers, soft drink, coffee, etc] . Visualize a texture image representing the drink's essence. Intersperse with relevant illustrations and motifs. Overlay with bold characters symbolizing the beverage's name in [english or japanese]. A detailed nutritional table and recycling symbols and emblems at a suitable location. The theme, color palette, and design elements should harmonize with the drink's character."
 
+# Object detection variables
+PIPELINE_CONFIG_PATH := /workspace/tx-trainer/object_detector/effdet0.config
+MODEL_DIR := /workspace/tx-trainer/models/effdet0
+EXPORT_SCRIPT := /tf/models/research/object_detection/exporter_main_v2.py
+EXPORT_DIR := $(MODEL_DIR)/exported
 
 # Targets
 build-docker:
@@ -65,3 +69,15 @@ evaluate-model:
 		--checkpoint_dir=$(MODEL_DIR) \
 		--sample_1_of_n_eval_examples=1 \
 		--alsologtostderr
+
+export-model:
+	@docker run -it \
+		-v "$(shell pwd)":/workspace/tx-trainer \
+		--gpus all --ipc=host --ulimit memlock=-1 --ulimit stack=67108864 \
+		-e CUDA_VISIBLE_DEVICES="-1" \
+		-e TF_CPP_MIN_LOG_LEVEL='0' \
+		$(IMAGE_NAME) \
+		python $(EXPORT_SCRIPT) \
+		--pipeline_config_path=$(PIPELINE_CONFIG_PATH) \
+		--trained_checkpoint_dir=$(MODEL_DIR) \
+		--output_directory=$(EXPORT_DIR)
