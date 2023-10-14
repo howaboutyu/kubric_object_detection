@@ -29,7 +29,7 @@ generate-textures:
     $(IMAGE_NAME) python /kubric/syndata_generator/sd2_texture_generator.py \
     --prompt=$(PROMPT) \
     --output_folder=generated_textures \
-    --num_images=200
+    --num_images=10000
 
 run-synthetic:
 	@docker run -it \
