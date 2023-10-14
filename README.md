@@ -103,18 +103,20 @@ This process will train the selected model, evaluate its performance, and export
 
 
 
-# Discussion
+# Report 
 
 
+## System Description
 
-## Challenges
+This project was conducted on a remote computer with the following specifications:
 
-Several challenges are encountered in this project, including:
+CPU: AMD Ryzen 7 2700X Eight-Core Processor
+GPU: NVIDIA RTX 2080ti and GeForce 1080
+RAM: 32GB
 
-* Some objects in the testing images are not present in the assets folder.
-* Variation in cameras, lighting conditions, backgrounds, and specular highlights.
-* Motion blur in the images.
-* Presence of objects other than bottles or cans.
-* Different environmental settings, such as items inside a fridge, on a table, or on a shelf.
-* Diverse material textures, including glass, plastic, and metal.
-* Varied object shapes, such as round, square, and cylindrical.
+
+## Experiments
+
+### Experiment 1
+
+This experiment used around 5k images and the original meshes provided in the assets folder, however after training the results were not great, alot of objects were not picked up by the object.
