@@ -1,6 +1,7 @@
 
 # Telexistence Assignment: Detecting Cans and Bottles via Synthetic Data
 
+![cool_image](https://github.com/howaboutyu/telexistence_assignment/assets/63342319/dc635088-ecd8-4fb9-8744-979ae975d27b)
 
 
 ## Introduction
