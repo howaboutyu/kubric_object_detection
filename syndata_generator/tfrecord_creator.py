@@ -232,5 +232,5 @@ if __name__ == "__main__":
     train_list = session_dir_list[: int(args.train_val_split * num_sessions)]
     val_list = session_dir_list[int(args.train_val_split * num_sessions) :]
 
-    write_to_shards(train_list, args.output_folder, 10, "train")
-    write_to_shards(val_list, args.output_folder, 2, "val")
+    write_to_shards(train_list, args.output_folder, 64, "train")
+    write_to_shards(val_list, args.output_folder, 8, "val")
