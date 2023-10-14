@@ -67,6 +67,23 @@ make create-tfrecords
 ### Downloading Data
 
 
+```bash
+# Download generated textures zip
+wget https://storage.googleapis.com/tx-hyu-task/generated_textures.zip
+unzip generated_textures.zip
+
+# Download generated data generated from kubric
+wget https://storage.googleapis.com/tx-hyu-task/kubric_synthetic_data_output.tar
+tar -xvf tfrecord_output.tar
+
+# Download tfrecords
+wget https://storage.googleapis.com/tx-hyu-task/tfrecord_output.tar
+tar -xvf tfrecord_output.tar
+```
+
+# Download 
+
+
 ## Object Detection
 
 The object detector is based on an EfficientDet 0 model, and it does not utilize any external pretrained weights. Two object detectors were trained during this project, both models undergoing 300,000 training steps with a batch size of 8. However, it's important to note that the data used and input sizes for these models were different.
@@ -75,7 +92,7 @@ The object detector is based on an EfficientDet 0 model, and it does not utilize
 
 - **Improved Model (v2):** A second model with an input size of 512x512 pixels was trained. It was initialized from the weights of the 384x384 model and used a larger dataset of approximately 16,000 images.
 
-### Reproduction
+### Training
 
 To reproduce the training process for either model, follow these steps:
 
@@ -100,6 +117,13 @@ make export-model
 ```
 
 This process will train the selected model, evaluate its performance, and export the trained model for future use.
+
+#### Weights
+
+
+
+## Inference
+
 
 
 
