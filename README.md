@@ -1,38 +1,39 @@
-# Telexistence Assignment Readme
+
+# Telexistence Assignment: Detecting Cans and Bottles via Synthetic Data
+
+
 
 ## Introduction
 
-This repository contains the code and resources for an object detection project focused on identifying bottles or cans using synthetic data. The project can be divided into two main components: synthetic data generation and object detection.
+This repository is designed to identify bottles and cans in real images by exclusively leveraging synthetic data during the training process. This endeavor unfolds into two pivotal components: synthetic data generation and object detection. Specifically, we utilize [Kubric](https://github.com/google-research/kubric) for rendering synthetic data using supplied asset geometries and employ [Stable Diffusion 2](https://huggingface.co/stabilityai) to generate random textures. Furthermore, the [TensorFlow Object Detection API](https://github.com/tensorflow/models/tree/master/research/object_detection) is used to adeptly train our object detection model.
 
 
 ## Setup
 
+### Pre-requisites: 
+
+Ensure to have [NVIDIA Docker Container Toolkit](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html#configuring-docker) installed on your system.
 
 ```bash
-sudo docker pull kubricdockerhub/kubruntu
-sudo docker build . --tag=gpu_docker_tf2 -f Dockerfile.gpu
+# Install 'make' utility
+sudo apt install build-essential
 ```
 
 
-## Ussage
+### Building Docker Images: 
 
-### random texture generation
+Execute the following command to build docker images:
 
-
-
-### syntehtic data generation
-
-
+```bash
+make build-docker
 ```
-docker run -it \
-        -v `pwd`:/kubric \
-        kubricdockerhub/kubruntu python /kubric/syndata_generator/kubric_generator.py \
-        --texture-dir syndata_generator/generated_textures  \
-        --output-path kubric_synthetic_data_output \
-        --num-generation 2000
-```
+The above command initiates the pull of `kubricdockerhub/kubruntu` for Kubric, subsequently building a Docker image tagged as `gpu_docker_tf2`. This image incorporates TensorFlow 2 for object detection and PyTorch.
 
-### Training
+
+# Discussion
+
+
+
 ## Challenges
 
 Several challenges are encountered in this project, including:
@@ -44,22 +45,3 @@ Several challenges are encountered in this project, including:
 * Different environmental settings, such as items inside a fridge, on a table, or on a shelf.
 * Diverse material textures, including glass, plastic, and metal.
 * Varied object shapes, such as round, square, and cylindrical.
-
-## Synthetic Data Generation Ideas
-
-To address these challenges, here are some ideas for synthetic data generation:
-
-* Utilize Kubric for mask and bounding box data generation.
-* Explore Generative AI techniques for texture generation and regeneration.
-* Create synthetic object meshes to diversify the dataset.
-
-
-## Project Plan
-
-The project plan is as follows:
-
-1. Generate a preliminary synthetic dataset using the assets provided in the `assets` folder.
-2. Utilize Kubric for mask and bounding box data generation.
-3. Train a model using the TensorFlow object detection API.
-4. Evaluate the model's performance with appropriate tests.
-5. Document the findings and outcomes in a report.
