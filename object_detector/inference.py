@@ -33,14 +33,14 @@ def draw_detections(
             [x1, y1], w, h, fill=False, edgecolor=color, linewidth=linewidth
         )
         ax.add_patch(patch)
-        # ax.text(
-        #     x1,
-        #     y1,
-        #     text,
-        #     bbox={"facecolor": color, "alpha": 0.4},
-        #     clip_box=ax.clipbox,
-        #     clip_on=True,
-        # )
+        ax.text(
+            x1,
+            y1,
+            text,
+            bbox={"facecolor": color, "alpha": 0.4},
+            clip_box=ax.clipbox,
+            clip_on=True,
+        )
 
     plt.savefig(output_image_file_name, bbox_inches="tight", pad_inches=0)
     if show_detection:
@@ -131,8 +131,7 @@ def run_inference(
         "detections": detection_results,
     }
 
-    with open(output_json_file_name, "w") as json_file:
-        json.dump(output_data, json_file)
+    
 
     # Draw detections on the image
     draw_detections(
@@ -143,6 +142,8 @@ def run_inference(
         output_image_file_name=output_image_file_name,
         show_detection=False,
     )
+
+    return output_data
 
 
 def main(args):
@@ -164,10 +165,11 @@ def main(args):
     if not os.path.exists(OUTPUT_DIR):
         os.makedirs(OUTPUT_DIR)
 
+    output_array = []
     for img_path in img_paths:
         base_name = os.path.basename(img_path)
         output_image_file_name = os.path.join(OUTPUT_DIR, base_name)
-        run_inference(
+        output_dict = run_inference(
             model,
             img_path,
             score_threshold=SCORE_THRESHOLD,
@@ -175,6 +177,11 @@ def main(args):
             output_json_file_name=OUTPUT_JSON_FILE_NAME,
             resize_size=RESIZE_SIZE,
         )
+        output_array.append(output_dict)
+
+    print(f'Saving output to {OUTPUT_JSON_FILE_NAME}')
+    with open(os.path.join(OUTPUT_JSON_FILE_NAME), "w") as f:
+        json.dump(output_array, f)
 
 
 if __name__ == "__main__":
