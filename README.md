@@ -1,9 +1,10 @@
 
 # Telexistence Assignment: Detecting Cans and Bottles via Synthetic Data
 
-<img src="https://github.com/howaboutyu/telexistence_assignment/assets/63342319/dc635088-ecd8-4fb9-8744-979ae975d27b" alt="cool_image" height="300px">
-<img src="https://github.com/howaboutyu/telexistence_assignment/assets/63342319/2787769a-a3de-4a79-8a4a-2dcabb90f345" alt="download" height="300px">
-
+<div style="display: flex;">
+    <img src="https://github.com/howaboutyu/telexistence_assignment/assets/63342319/dc635088-ecd8-4fb9-8744-979ae975d27b" alt="cool_image" height="300px">
+    <img src="https://github.com/howaboutyu/telexistence_assignment/assets/63342319/2787769a-a3de-4a79-8a4a-2dcabb90f345" alt="download" height="300px">
+</div>
 
 ## Introduction
 
@@ -213,23 +214,17 @@ An initial model was trained with around 9k images, as the data generation pipel
 
 The results obtained from the EfficientDet V0 model with a 512x512 input resolution, using a probability threshold of 0.5 for bounding boxes, are displayed below. Notably, there are instances of misclassification for certain classes, and in some cases, objects are not accurately detected. It is worth noting that the detector's performance is somewhat suboptimal in specific images. This could potentially be attributed to differences in lighting conditions between the synthetic data used for training and the real-world target images. 
 
-![017](https://github.com/howaboutyu/telexistence_assignment/assets/63342319/e0450aa7-671a-4c2c-89a9-c4607664ebdb)
-![016](https://github.com/howaboutyu/telexistence_assignment/assets/63342319/6b685eef-acc5-4345-afb4-72e51e785fba)
-![015](https://github.com/howaboutyu/telexistence_assignment/assets/63342319/b4fe73a1-c516-430a-9d1a-791fc9ad1aca)
-![014](https://github.com/howaboutyu/telexistence_assignment/assets/63342319/41fb2c90-0fdd-41a3-aaff-d0feea71058b)
-![013](https://github.com/howaboutyu/telexistence_assignment/assets/63342319/0796241d-317c-4231-aa2e-2ddc5429f49a)
-![012](https://github.com/howaboutyu/telexistence_assignment/assets/63342319/8438426d-640a-455a-b731-553f3d07e42a)
-![011](https://github.com/howaboutyu/telexistence_assignment/assets/63342319/1293cfed-f157-4589-b59f-70079e275832)
-![010](https://github.com/howaboutyu/telexistence_assignment/assets/63342319/d6b48b37-47d6-4063-a6ae-e47585ed0298)
-![009](https://github.com/howaboutyu/telexistence_assignment/assets/63342319/91a1b2c3-bc89-48e6-9fb5-e77ee20b46c0)
-![008](https://github.com/howaboutyu/telexistence_assignment/assets/63342319/b701662f-f85e-4b61-bae5-1821d2720351)
-![007](https://github.com/howaboutyu/telexistence_assignment/assets/63342319/53740d36-7f50-4d70-b673-36dc11a99331)
-![006](https://github.com/howaboutyu/telexistence_assignment/assets/63342319/9e92ddf7-2bdc-4ae4-bd03-60c2191205d2)
-![005](https://github.com/howaboutyu/telexistence_assignment/assets/63342319/08d1c403-87e3-4a67-a6e8-0bc523db73fe)
-![004](https://github.com/howaboutyu/telexistence_assignment/assets/63342319/7f25f153-bf8d-4e99-a3f4-4a7fa8b7fd0a)
-![003](https://github.com/howaboutyu/telexistence_assignment/assets/63342319/8884760d-5a96-4814-838d-9c048977263b)
-![002](https://github.com/howaboutyu/telexistence_assignment/assets/63342319/70883120-cc71-48a5-8be4-1bf68b97db4d)
-![001](https://github.com/howaboutyu/telexistence_assignment/assets/63342319/01d0ec86-669d-4b9f-b59f-c24bba30cf8a)
+| ![017](https://github.com/howaboutyu/telexistence_assignment/assets/63342319/e0450aa7-671a-4c2c-89a9-c4607664ebdb) | ![016](https://github.com/howaboutyu/telexistence_assignment/assets/63342319/6b685eef-acc5-4345-afb4-72e51e785fba) |
+|---|---|
+| ![015](https://github.com/howaboutyu/telexistence_assignment/assets/63342319/b4fe73a1-c516-430a-9d1a-791fc9ad1aca) | ![014](https://github.com/howaboutyu/telexistence_assignment/assets/63342319/41fb2c90-0fdd-41a3-aaff-d0feea71058b) |
+| ![013](https://github.com/howaboutyu/telexistence_assignment/assets/63342319/0796241d-317c-4231-aa2e-2ddc5429f49a) | ![012](https://github.com/howaboutyu/telexistence_assignment/assets/63342319/8438426d-640a-455a-b731-553f3d07e42a) |
+| ![011](https://github.com/howaboutyu/telexistence_assignment/assets/63342319/1293cfed-f157-4589-b59f-70079e275832) | ![010](https://github.com/howaboutyu/telexistence_assignment/assets/63342319/d6b48b37-47d6-4063-a6ae-e47585ed0298) |
+| ![009](https://github.com/howaboutyu/telexistence_assignment/assets/63342319/91a1b2c3-bc89-48e6-9fb5-e77ee20b46c0) | ![008](https://github.com/howaboutyu/telexistence_assignment/assets/63342319/b701662f-f85e-4b61-bae5-1821d2720351) |
+| ![007](https://github.com/howaboutyu/telexistence_assignment/assets/63342319/53740d36-7f50-4d70-b673-36dc11a99331) | ![006](https://github.com/howaboutyu/telexistence_assignment/assets/63342319/9e92ddf7-2bdc-4ae4-bd03-60c2191205d2) |
+| ![005](https://github.com/howaboutyu/telexistence_assignment/assets/63342319/08d1c403-87e3-4a67-a6e8-0bc523db73fe) | ![004](https://github.com/howaboutyu/telexistence_assignment/assets/63342319/7f25f153-bf8d-4e99-a3f4-4a7fa8b7fd0a) |
+| ![003](https://github.com/howaboutyu/telexistence_assignment/assets/63342319/8884760d-5a96-4814-838d-9c048977263b) | ![002](https://github.com/howaboutyu/telexistence_assignment/assets/63342319/70883120-cc71-48a5-8be4-1bf68b97db4d) |
+| ![001](https://github.com/howaboutyu/telexistence_assignment/assets/63342319/01d0ec86-669d-4b9f-b59f-c24bba30cf8a) | |
+
 
 
 ## Discussion
