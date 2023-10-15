@@ -230,7 +230,7 @@ In my approach to utilizing synthetic data for training object detection models,
 
 However, it's worth noting a specific issue in the results section: a bottle of Coca-Cola was misclassified as a can. This misclassification might be attributed to the usage of a Coke can in the original assets, which were exclusively used for generating can bounding boxes. To mitigate such issues in the future, it might be beneficial to avoid using textures derived from the original assets.
 
-Moreover, further improvements can be made by expanding the dataset. Increasing the number of generated images beyond the current 27k and introducing more variation in lighting conditions, shapes, and object poses could enhance the model's accuracy.
+Additionally, it's worth noting that the detector failed to detect many objects. I believe this issue can be addressed by expanding the dataset. Increasing the number of generated images beyond the current 27k and introducing more variations in lighting conditions, shapes, and object poses could significantly enhance the model's ability to detect objects.
 
 ## Future Work
 Future investigations could delve into generating higher-resolution images using Kubric, incorporating a wider array of shape variations, and developing more realistic environments within Kubric. Additionally, exploring training with other detection models, such as EfficientDet V1 to V6, or instance segmentation algorithms, and experimenting with various augmentation techniques and generative AI methods could be considered for potential research avenues.
