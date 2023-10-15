@@ -186,15 +186,6 @@ The JSON output consists of a list of dictionaries, with each dictionary represe
 # Report 
 
 
-## System Description
-
-This project was conducted on a remote computer with the following specifications:
-```bash
-CPU: AMD Ryzen 7 2700X Eight-Core Processor
-GPU: NVIDIA RTX 2080ti and GeForce 1080
-RAM: 32GB
-```
-
 
 ## <a name="Discussion"></a> Method
 
@@ -208,7 +199,7 @@ A total of 2600 Kubric sessions were generated, each containing 10 images, resul
 An initial model was trained with around 9k images, as the data generation pipeline is somewhat slow. Training consisted of 300k steps, using an input size of 384x384, a batch size of 8, and cosine learning rate decay. This model was trained from scratch without loading any pretrained weights. The configuration file for this model can be found at `object_detector/effdet0.config`. During the training of this model, the Kubric data generation reached approximately 26k images. Subsequently, another EfficientDet V0 model was trained for 50k steps with a shape of 512x512, initialized with weights from the 384x384 model. The configuration for the second model can be found at `object_detector/effdet0-v2.config`.
 
 
-## Results
+### Results
 
 The results obtained from the EfficientDet V0 model with a 512x512 input resolution, using a probability threshold of 0.5 for bounding boxes, are displayed below. Notably, there are instances of misclassification for certain classes, and in some cases, objects are not accurately detected. It is worth noting that the detector's performance is somewhat suboptimal in specific images. This could potentially be attributed to differences in lighting conditions between the synthetic data used for training and the real-world target images. 
 
@@ -225,12 +216,25 @@ The results obtained from the EfficientDet V0 model with a 512x512 input resolut
 
 
 
-## Discussion
+### Discussion
 In my approach to utilizing synthetic data for training object detection models, creating realistic images closely resembling target images was essential. I employed Stable Diffusion to introduce random textures to bottle and can assets, which helped the detector focus on learning object shapes rather than being overly influenced by texture details.
 
 However, it's worth noting a specific issue in the results section: a bottle of Coca-Cola was misclassified as a can. This misclassification might be attributed to the usage of a Coke can in the original assets, which were exclusively used for generating can bounding boxes. To mitigate such issues in the future, it might be beneficial to avoid using textures derived from the original assets.
 
-Additionally, it's worth noting that the detector failed to detect many objects. I believe this issue can be addressed by expanding the dataset. Increasing the number of generated images beyond the current 27k and introducing more variations in lighting conditions, shapes, and object poses could significantly enhance the model's ability to detect objects.
+Additionally, it's worth noting that the detector failed to detect many objects (such as the image with the Costa coffee bottles). I believe this issue can be addressed by expanding the dataset by increasing the number of generated images beyond the current 27k and introducing more variations in lighting conditions, shapes, and object poses could significantly enhance the model's ability to detect objects.
 
-## Future Work
+### Future Work
 Future investigations could delve into generating higher-resolution images using Kubric, incorporating a wider array of shape variations, and developing more realistic environments within Kubric. Additionally, exploring training with other detection models, such as EfficientDet V1 to V6, or instance segmentation algorithms, and experimenting with various augmentation techniques and generative AI methods could be considered for potential research avenues.
+
+### Conclusion
+It was incredibly fascinating to witness how synthetic data can be leveraged to train an object detector capable of identifying real-world objects. This learning experience was very enlightening. 🤩😎
+
+
+## System Description
+
+This project was conducted on a remote computer with the following specifications:
+```bash
+CPU: AMD Ryzen 7 2700X Eight-Core Processor
+GPU: NVIDIA RTX 2080ti and GeForce 1080
+RAM: 32GB
+```
