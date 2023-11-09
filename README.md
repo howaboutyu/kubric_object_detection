@@ -1,8 +1,8 @@
 
 # Detecting Cans and Bottles via Synthetic Data
 
-| ![cool_image](https://github.com/howaboutyu/kubric_object_detection/assets/63342319/dc635088-ecd8-4fb9-8744-979ae975d27b) | ![download](https://github.com/howaboutyu/kubric_object_detection/assets/63342319/2787769a-a3de-4a79-8a4a-2dcabb90f345) |
-|:---:|:---:|
+![cool_image](https://github.com/howaboutyu/kubric_object_detection/assets/63342319/ac33a42c-53f5-4615-bceb-cbec99fc6991)
+
 
 ## Introduction
 
@@ -183,45 +183,3 @@ The JSON output consists of a list of dictionaries, with each dictionary represe
   * Bounding Box (bbox): A list of integers representing the bounding box coordinates around the detected object. The format is [x_min, y_min, x_max, y_max], where (x_min, y_min) is the top-left corner, and (x_max, y_max) is the bottom-right corner of the bounding box.
 
 
-# Report 
-
-
-
-## <a name="Discussion"></a> Method
-
-### Synthetic Data
-Synthetic data was generated using Kubric with random domain randomization techniques, as outlined above. Kubric rendering was relatively slow, taking approximately 2 minutes to render 10 images per session, which might be due to the current Kubric Docker image not supporting GPU rendering. Additionally, the random object placement function currently positions objects on a plane without considering the physics of placement. As a result, objects are sometimes placed in physically impossible configurations, such as overlapping, which diminishes the realism of the synthetic data.
-
-A total of 2600 Kubric sessions were generated, each containing 10 images, resulting in a total of 26,000 images.
-
-### Object Detection
-
-An initial model was trained with around 9k images, as the data generation pipeline is somewhat slow. Training consisted of 300k steps, using an input size of 384x384, a batch size of 8, and cosine learning rate decay. This model was trained from scratch without loading any pretrained weights. The configuration file for this model can be found at `object_detector/effdet0.config`. During the training of this model, the Kubric data generation reached approximately 26k images. Subsequently, another EfficientDet V0 model was trained for 50k steps with a shape of 512x512, initialized with weights from the 384x384 model. The configuration for the second model can be found at `object_detector/effdet0-v2.config`.
-
-
-### Results
-
-The results obtained from the EfficientDet V0 model with a 512x512 input resolution, using a probability threshold of 0.5 for bounding boxes, are displayed below. Notably, there are instances of misclassification for certain classes, and in some cases, objects are not accurately detected. It is worth noting that the detector's performance is somewhat suboptimal in specific images. This could potentially be attributed to differences in lighting conditions between the synthetic data used for training and the real-world target images. 
-
-| ![017](https://github.com/howaboutyu/kubric_object_detection/assets/63342319/e0450aa7-671a-4c2c-89a9-c4607664ebdb) | ![016](https://github.com/howaboutyu/kubric_object_detection/assets/63342319/6b685eef-acc5-4345-afb4-72e51e785fba) |
-|---|---|
-| ![015](https://github.com/howaboutyu/kubric_object_detection/assets/63342319/b4fe73a1-c516-430a-9d1a-791fc9ad1aca) | ![014](https://github.com/howaboutyu/kubric_object_detection/assets/63342319/41fb2c90-0fdd-41a3-aaff-d0feea71058b) |
-| ![013](https://github.com/howaboutyu/kubric_object_detection/assets/63342319/0796241d-317c-4231-aa2e-2ddc5429f49a) | ![012](https://github.com/howaboutyu/kubric_object_detection/assets/63342319/8438426d-640a-455a-b731-553f3d07e42a) |
-| ![011](https://github.com/howaboutyu/kubric_object_detection/assets/63342319/1293cfed-f157-4589-b59f-70079e275832) | ![010](https://github.com/howaboutyu/kubric_object_detection/assets/63342319/d6b48b37-47d6-4063-a6ae-e47585ed0298) |
-| ![009](https://github.com/howaboutyu/kubric_object_detection/assets/63342319/91a1b2c3-bc89-48e6-9fb5-e77ee20b46c0) | ![008](https://github.com/howaboutyu/kubric_object_detection/assets/63342319/b701662f-f85e-4b61-bae5-1821d2720351) |
-| ![007](https://github.com/howaboutyu/kubric_object_detection/assets/63342319/53740d36-7f50-4d70-b673-36dc11a99331) | ![006](https://github.com/howaboutyu/kubric_object_detection/assets/63342319/9e92ddf7-2bdc-4ae4-bd03-60c2191205d2) |
-| ![005](https://github.com/howaboutyu/kubric_object_detection/assets/63342319/08d1c403-87e3-4a67-a6e8-0bc523db73fe) | ![004](https://github.com/howaboutyu/kubric_object_detection/assets/63342319/7f25f153-bf8d-4e99-a3f4-4a7fa8b7fd0a) |
-| ![003](https://github.com/howaboutyu/kubric_object_detection/assets/63342319/8884760d-5a96-4814-838d-9c048977263b) | ![002](https://github.com/howaboutyu/kubric_object_detection/assets/63342319/70883120-cc71-48a5-8be4-1bf68b97db4d) |
-| ![001](https://github.com/howaboutyu/kubric_object_detection/assets/63342319/01d0ec86-669d-4b9f-b59f-c24bba30cf8a) | |
-
-
-
-### Discussion
-In my approach to utilizing synthetic data for training object detection models, creating realistic images closely resembling target images was essential. I employed Stable Diffusion to introduce random textures to bottle and can assets, which helped the detector focus on learning object shapes rather than being overly influenced by texture details.
-
-However, it's worth noting a specific issue in the results section: a bottle of Coca-Cola was misclassified as a can. This misclassification might be attributed to the usage of a Coke can in the original assets, which were exclusively used for generating can bounding boxes. To mitigate such issues in the future, it might be beneficial to avoid using textures derived from the original assets.
-
-Additionally, it's worth noting that the detector failed to detect many objects (such as the image with the Costa coffee bottles). I believe this issue can be addressed by expanding the dataset by increasing the number of generated images beyond the current 27k and introducing more variations in lighting conditions, shapes, and object poses could significantly enhance the model's ability to detect objects.
-
-### Future Work
-Future investigations could delve into generating higher-resolution images using Kubric, incorporating a wider array of shape variations, and developing more realistic environments within Kubric. Additionally, exploring training with other detection models, such as EfficientDet V1 to V6, or instance segmentation algorithms, and experimenting with various augmentation techniques and generative AI methods could be considered for potential research avenues.
