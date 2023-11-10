@@ -183,3 +183,15 @@ The JSON output consists of a list of dictionaries, with each dictionary represe
   * Bounding Box (bbox): A list of integers representing the bounding box coordinates around the detected object. The format is [x_min, y_min, x_max, y_max], where (x_min, y_min) is the top-left corner, and (x_max, y_max) is the bottom-right corner of the bounding box.
 
 
+
+## Results
+
+Here are some detection outputs from the model on real-world images.
+
+|  |  |
+|---|---|
+| ![005](https://github.com/howaboutyu/kubric_object_detection/assets/63342319/dbdc1b83-5883-44bf-bb23-87e397446185) | ![004](https://github.com/howaboutyu/kubric_object_detection/assets/63342319/6009efba-4fa9-44b1-8580-cff11e4db2aa) |
+| ![003](https://github.com/howaboutyu/kubric_object_detection/assets/63342319/7b74534a-a30a-4ff3-b76c-50e706e2eec4) | ![002](https://github.com/howaboutyu/kubric_object_detection/assets/63342319/0fd5c9d4-eca5-4235-b0c2-8bad50b00c80) |
+
+
+
